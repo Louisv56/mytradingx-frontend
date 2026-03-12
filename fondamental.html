@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyse Fondamentale — MyTradingX</title>
+<link rel="stylesheet" href="style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RSYYGQZ0MD"></script>
+<style>
+.fond-page { padding: 88px 0 60px; }
+.fond-layout { display: grid; grid-template-columns: 360px 1fr; gap: 24px; align-items: start; }
+.news-item { background: var(--bg2); border-radius: var(--radius); padding: 12px 14px; margin: 8px 0; }
+.news-impact { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72em; font-weight: 700; margin-bottom: 6px; }
+.impact-pos { background: #16a34a33; color: #22c55e; }
+.impact-neg { background: #dc262633; color: #f87171; }
+.impact-neu { background: #ca8a0433; color: #facc15; }
+.sentiment-badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 1.1em;
+}
+.facteur-item { padding: 4px 0; color: var(--muted2); font-size: 0.88rem; }
+.facteur-item::before { content: "→ "; color: var(--accent); }
+.pro-lock-banner {
+  background: var(--card); border: 2px dashed var(--accent2)55;
+  border-radius: var(--radius-lg); padding: 48px 24px;
+  text-align: center;
+}
+.pro-lock-banner h2 { color: #a78bfa; margin-bottom: 8px; }
+.pro-lock-banner p  { margin-bottom: 24px; }
+@media (max-width: 900px) {
+  .fond-layout { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">MyTrading<span>X</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="analyse.html">Analyse</a>
+    <a href="fondamental.html" class="active">Fondamental</a>
+  </div>
+  <div class="nav-right">
+    <span id="navUser" class="nav-user hidden"></span>
+    <span id="navPlan" class="nav-plan hidden"></span>
+    <a href="login.html" id="navLogin" class="btn btn-outline btn-sm hidden">Connexion</a>
+    <button onclick="logout()" id="navLogout" class="btn btn-secondary btn-sm hidden">Déconnexion</button>
+  </div>
+</nav>
+
+<div class="fond-page">
+  <div class="container">
+
+    <div style="margin-bottom:24px;">
+      <div class="section-label">MytAI <span class="badge badge-pro-tag">PRO</span></div>
+      <h1>Analyse Fondamentale</h1>
+      <p style="margin-top:8px;">MytAI analyse l'actualité du jour pour déterminer si le marché est haussier ou baissier.</p>
+    </div>
+
+    <!-- Si pas Pro → banner lock -->
+    <div id="proLockBanner" class="pro-lock-banner hidden">
+      <div style="font-size:3rem;margin-bottom:16px;">🔒</div>
+      <h2>Fonctionnalité Pro</h2>
+      <p>L'analyse fondamentale est réservée aux abonnés Pro.<br>Passez au plan Pro pour accéder à l'actualité des marchés en temps réel.</p>
+      <button class="btn btn-pro btn-lg" onclick="openUpgradeModal()">Passer au plan Pro — 19€/mois</button>
+      <p style="margin-top:12px;font-size:0.78rem;">Prix de lancement · Sans engagement</p>
+    </div>
+
+    <!-- Interface fondamentale (Pro uniquement) -->
+    <div id="fondContent" class="hidden">
+      <div class="fond-layout">
+
+        <!-- Formulaire -->
+        <div>
+          <div class="card">
+            <div class="panel-title">🌐 Analyser un actif</div>
+            <div class="form-group">
+              <label>Actif à analyser</label>
+              <input type="text" id="fundAsset" placeholder="BTC, EURUSD, Gold, SP500...">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="analyzeFundamental()">Lancer l'analyse</button>
+            <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="resetFundamental()">Reset</button>
+            <div class="loader" id="fundLoader">Analyse de l'actualité en cours</div>
+
+            <hr class="divider">
+            <div style="font-size:0.8rem;color:var(--muted);">
+              <strong style="color:var(--muted2);">Actifs supportés :</strong><br>
+              Crypto : BTC, ETH, SOL, XRP<br>
+              Forex : EURUSD, GBPUSD, USDJPY<br>
+              Indices : SP500, NASDAQ<br>
+              Matières : GOLD, OIL
+            </div>
+          </div>
+        </div>
+
+        <!-- Résultat -->
+        <div>
+          <div id="fundPlaceholder" class="card" style="text-align:center;padding:60px 24px;color:var(--muted);">
+            <div style="font-size:3rem;margin-bottom:16px;">📰</div>
+            <h3 style="color:var(--muted2);margin-bottom:8px;">En attente d'analyse</h3>
+            <p>Entrez un actif et lancez l'analyse pour voir le sentiment du marché.</p>
+          </div>
+          <div id="fundResult" class="hidden"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Upgrade Modal ── -->
+<div id="upgradeModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:420px;text-align:center;">
+    <h2>Plan Pro requis</h2>
+    <div style="background:#7c3aed15;border:1px solid #7c3aed33;border-radius:8px;padding:8px 14px;margin:12px 0;font-size:0.82em;color:#a78bfa;">
+      🎉 <strong>Prix de lancement</strong> — 19€/mois au lieu de 39€
+    </div>
+    <div class="plan-card popular" style="margin:16px 0;">
+      <div style="font-weight:700;margin-bottom:4px;color:#a78bfa;">⭐ Pro</div>
+      <div class="plan-price-old">39€/mois</div>
+      <div class="price" style="font-family:'Syne',sans-serif;font-size:2em;font-weight:800;color:#a78bfa;">19€<span style="font-size:0.45em;color:var(--muted2);">/mois</span></div>
+      <ul style="text-align:left;"><li>Analyses illimitées</li><li>MytAI Fast, Pro, Vision, Expert</li><li>Analyse Fondamentale ✓</li></ul>
+      <button class="btn btn-pro btn-full" onclick="subscribe('pro')">Choisir Pro</button>
+    </div>
+    <p style="font-size:0.72em;color:var(--muted);">Sans engagement · Résiliable à tout moment</p>
+    <button class="btn btn-secondary btn-full mt-4" onclick="closeUpgradeModal()">Fermer</button>
+  </div>
+</div>
+
+<!-- ── Auth Modal ── -->
+<div id="authModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:420px;">
+    <h2>Connecte-toi pour continuer</h2>
+    <p style="margin-bottom:20px;font-size:0.88rem;">Crée un compte gratuit et reçois 2 analyses offertes.</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Se connecter</button>
+      <button class="auth-tab" id="authTabRegister" onclick="switchAuthTab('register')">S'inscrire</button>
+    </div>
+    <div class="form-group"><input type="email" id="authEmail" placeholder="Email"></div>
+    <div class="form-group"><input type="password" id="authPassword" placeholder="Mot de passe"></div>
+    <button class="btn btn-primary btn-full" id="authSubmitBtn" onclick="doAuth()">Se connecter</button>
+    <p id="authMsg" style="font-size:0.85rem;color:var(--danger);text-align:center;margin-top:10px;min-height:20px;"></p>
+    <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="closeAuthModal()">Fermer</button>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  initNav();
+  checkPaymentReturn();
+  var user = getUser();
+
+  if (!user) {
+    // Pas connecté → montre le lock + bouton connexion dans la nav
+    document.getElementById("proLockBanner").classList.remove("hidden");
+    return;
+  }
+
+  if (user.plan !== "pro") {
+    document.getElementById("proLockBanner").classList.remove("hidden");
+  } else {
+    document.getElementById("fondContent").classList.remove("hidden");
+  }
+});
+
+async function analyzeFundamental() {
+  var user = getUser();
+  if (!user) { openAuthModal(); return; }
+  if (user.plan !== "pro") { openUpgradeModal(); return; }
+
+  var asset = document.getElementById("fundAsset").value.trim();
+  if (!asset) { alert("Saisis un actif (ex: BTC, EURUSD, Gold)"); return; }
+
+  var loader = document.getElementById("fundLoader");
+  loader.style.display = "block";
+  document.getElementById("fundResult").classList.add("hidden");
+  document.getElementById("fundPlaceholder").classList.remove("hidden");
+
+  try {
+    var res  = await fetch(API + "/fundamental", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({email: user.email, password: user.password, asset})
+    });
+    var data = await res.json();
+    if (data.error === "PRO_ONLY") { openUpgradeModal(); return; }
+    if (data.error) { alert("Erreur : " + data.error); return; }
+    renderFundamental(data);
+  } catch(e) {
+    alert("Erreur réseau : " + e.message);
+  } finally {
+    loader.style.display = "none";
+  }
+}
+
+function resetFundamental() {
+  document.getElementById("fundAsset").value = "";
+  document.getElementById("fundResult").innerHTML = "";
+  document.getElementById("fundResult").classList.add("hidden");
+  document.getElementById("fundPlaceholder").classList.remove("hidden");
+}
+
+function renderFundamental(data) {
+  var placeholder = document.getElementById("fundPlaceholder");
+  var result      = document.getElementById("fundResult");
+  placeholder.classList.add("hidden");
+  result.classList.remove("hidden");
+
+  var color = data.sentiment_couleur || "var(--warning)";
+
+  var newsHtml = "";
+  if (Array.isArray(data.news_cles)) {
+    data.news_cles.forEach(function(n) {
+      var ic = n.impact === "POSITIF" ? "impact-pos" : n.impact === "NEGATIF" ? "impact-neg" : "impact-neu";
+      newsHtml += '<div class="news-item">'
+        + '<span class="news-impact ' + ic + '">' + n.impact + '</span>'
+        + '<div style="font-size:0.9em;font-weight:600;margin:3px 0;">' + n.titre + '</div>'
+        + '<div style="font-size:0.82em;color:var(--muted2);">' + n.explication + '</div>'
+        + '</div>';
+    });
+  }
+
+  var facteursHtml = "";
+  if (Array.isArray(data.facteurs_surveillance)) {
+    data.facteurs_surveillance.forEach(function(f) {
+      facteursHtml += '<div class="facteur-item">' + f + '</div>';
+    });
+  }
+
+  result.innerHTML = '<div class="result-box">'
+    + '<div style="margin-bottom:16px;">'
+    + '<div class="result-label" style="margin-bottom:8px;">Sentiment — ' + data.actif + '</div>'
+    + '<div class="sentiment-badge" style="background:' + color + '22;border:1px solid ' + color + '44;">'
+    + '<span style="width:12px;height:12px;border-radius:50%;background:' + color + ';display:inline-block;"></span>'
+    + '<span style="color:' + color + '">' + data.sentiment + '</span>'
+    + (data.confiance ? '<span style="color:var(--muted2);font-size:0.82em;">— ' + data.confiance + '% de confiance</span>' : '')
+    + '</div>'
+    + '</div>'
+
+    + '<div class="result-section"><div class="result-label">Résumé</div>' + (data.resume||"") + '</div>'
+
+    + '<div style="margin:14px 0;">'
+    + '<div class="result-label" style="border-left:3px solid var(--accent);padding-left:10px;margin-bottom:8px;">News clés du jour</div>'
+    + newsHtml
+    + '</div>'
+
+    + (facteursHtml ? '<div class="result-section"><div class="result-label">À surveiller</div>' + facteursHtml + '</div>' : '')
+
+    + '<hr class="divider">'
+    + '<div class="result-section"><div class="result-label">Conclusion</div>' + (data.conclusion||"") + '</div>'
+
+    + (data.nb_news ? '<div style="font-size:0.72em;color:var(--muted);text-align:right;margin-top:8px;">' + data.nb_news + ' articles analysés</div>' : '')
+    + '</div>';
+}
+</script>
+</body>
+</html>

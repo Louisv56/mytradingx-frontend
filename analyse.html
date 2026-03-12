@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyse Graphique — MyTradingX</title>
+<link rel="stylesheet" href="style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RSYYGQZ0MD"></script>
+<style>
+.analyse-page { padding: 88px 0 60px; }
+.analyse-layout { display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start; }
+.panel-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.news-item { background: var(--bg2); border-radius: var(--radius); padding: 10px 12px; margin: 6px 0; }
+.news-impact { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72em; font-weight: 700; margin-bottom: 4px; }
+.impact-pos { background: #16a34a33; color: #22c55e; }
+.impact-neg { background: #dc262633; color: #f87171; }
+.impact-neu { background: #ca8a0433; color: #facc15; }
+@media (max-width: 900px) {
+  .analyse-layout { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">MyTrading<span>X</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="analyse.html" class="active">Analyse</a>
+    <a href="fondamental.html">Fondamental</a>
+  </div>
+  <div class="nav-right">
+    <span id="navUser" class="nav-user hidden"></span>
+    <span id="navPlan" class="nav-plan hidden"></span>
+    <a href="login.html" id="navLogin" class="btn btn-outline btn-sm hidden">Connexion</a>
+    <button onclick="logout()" id="navLogout" class="btn btn-secondary btn-sm hidden">Déconnexion</button>
+  </div>
+</nav>
+
+<div class="analyse-page">
+  <div class="container">
+
+    <div style="margin-bottom:24px;">
+      <div class="section-label">MytAI</div>
+      <h1>Analyse Graphique</h1>
+    </div>
+
+    <!-- Quota bar -->
+    <div class="quota-bar mb-4" id="quotaBar" style="display:none;">
+      <span id="quotaLabel" style="font-size:0.85rem;white-space:nowrap;"></span>
+      <div class="quota-track"><div class="quota-fill" id="quotaFill"></div></div>
+      <span id="quotaMax" style="font-size:0.82rem;color:var(--muted2);white-space:nowrap;"></span>
+    </div>
+
+    <div class="analyse-layout">
+
+      <!-- ── Formulaire ── -->
+      <div>
+        <div class="card">
+
+          <!-- Sélecteur modèle -->
+          <div class="section-label" style="margin-bottom:8px;">Moteur MytAI</div>
+          <div class="model-grid" id="modelGrid">
+            <div class="model-btn active" id="btn-gpt-4o-mini" onclick="selectModel('gpt-4o-mini')">
+              MytAI Fast<span class="model-tag tag-free">Gratuit</span>
+            </div>
+            <div class="model-btn locked" id="btn-gpt-4o" onclick="selectModel('gpt-4o')">
+              MytAI Pro<span class="model-tag tag-premium">Premium+</span>
+            </div>
+            <div class="model-btn locked" id="btn-gemini" onclick="selectModel('gemini')">
+              MytAI Vision<span class="model-tag tag-premium">Premium+</span>
+            </div>
+            <div class="model-btn locked" id="btn-claude" onclick="selectModel('claude')">
+              MytAI Expert<span class="model-tag tag-pro">Pro</span>
+            </div>
+          </div>
+          <div style="font-size:0.75rem;color:var(--muted);text-align:right;margin:4px 0 14px 0;" id="modelUsedInfo"></div>
+
+          <hr class="divider">
+
+          <!-- Actif & Timeframe -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Actif</label>
+              <input type="text" id="asset" placeholder="EURUSD, BTC...">
+            </div>
+            <div class="form-group">
+              <label>Timeframe</label>
+              <select id="timeframe">
+                <option value="">Sélectionner</option>
+                <option value="M1">M1</option>
+                <option value="M5">M5</option>
+                <option value="M15">M15</option>
+                <option value="H1">H1</option>
+                <option value="H4">H4</option>
+                <option value="D1">D1</option>
+                <option value="W1">W1</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Upload zones -->
+          <div class="form-group">
+            <label>High TimeFrame (M15 · H1 · H4)</label>
+            <div class="drop-zone" id="dropHTF">📈 Glissez ou cliquez pour uploader</div>
+            <input type="file" id="imageHTF" accept="image/*" class="hidden">
+          </div>
+          <div class="form-group">
+            <label>Low TimeFrame (M1 · M5 · M15)</label>
+            <div class="drop-zone" id="dropLTF">📉 Glissez ou cliquez pour uploader</div>
+            <input type="file" id="imageLTF" accept="image/*" class="hidden">
+          </div>
+
+          <button class="btn btn-primary btn-full mt-4" onclick="analyze()">Analyser</button>
+          <button class="btn btn-secondary btn-full mt-4" onclick="resetForm()" style="margin-top:8px;">Reset</button>
+          <button class="btn btn-full mt-4" onclick="openUpgradeModal()" style="margin-top:8px;background:linear-gradient(135deg,var(--accent2),#4f46e5);color:white;">Voir les offres Premium & Pro</button>
+
+          <div class="loader" id="loader">MytAI analyse votre graphique</div>
+        </div>
+      </div>
+
+      <!-- ── Résultat ── -->
+      <div>
+        <div id="resultPlaceholder" class="card" style="text-align:center;padding:60px 24px;color:var(--muted);">
+          <div style="font-size:3rem;margin-bottom:16px;">📊</div>
+          <h3 style="color:var(--muted2);margin-bottom:8px;">En attente d'analyse</h3>
+          <p>Uploadez un graphique et lancez l'analyse pour voir le résultat ici.</p>
+        </div>
+        <div id="result" class="hidden"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Upgrade Modal ── -->
+<div id="upgradeModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:560px;">
+    <h2>Passez à la version supérieure</h2>
+    <div style="background:#7c3aed15;border:1px solid #7c3aed33;border-radius:8px;padding:8px 14px;margin:12px 0;font-size:0.82em;color:#a78bfa;">
+      🎉 <strong>Prix de lancement</strong> — Offre limitée aux 50 premiers abonnés
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div style="font-weight:700;margin-bottom:4px;">Premium</div>
+        <div class="plan-price-old">19€/mois</div>
+        <div class="price" style="font-family:'Syne',sans-serif;font-size:1.8em;font-weight:800;color:var(--accent);">9€<span style="font-size:0.5em;color:var(--muted2);">/mois</span></div>
+        <div class="plan-economy">Économisez 10€/mois</div>
+        <ul><li>50 analyses/mois</li><li>MytAI Fast, Pro, Vision</li></ul>
+        <button class="btn btn-outline btn-full" onclick="subscribe('premium')">Choisir Premium</button>
+      </div>
+      <div class="plan-card popular">
+        <div style="font-weight:700;margin-bottom:4px;color:#a78bfa;">⭐ Pro</div>
+        <div class="plan-price-old">39€/mois</div>
+        <div class="price" style="font-family:'Syne',sans-serif;font-size:1.8em;font-weight:800;color:#a78bfa;">19€<span style="font-size:0.5em;color:var(--muted2);">/mois</span></div>
+        <div class="plan-economy">Économisez 20€/mois</div>
+        <ul><li>Analyses illimitées</li><li>MytAI Fast, Pro, Vision, Expert</li><li>Analyse Fondamentale</li></ul>
+        <button class="btn btn-pro btn-full" onclick="subscribe('pro')">Choisir Pro</button>
+      </div>
+    </div>
+    <p style="font-size:0.72em;color:var(--muted);text-align:center;margin-top:8px;">Sans engagement · Résiliable à tout moment</p>
+    <button class="btn btn-secondary btn-full mt-4" onclick="closeUpgradeModal()">Fermer</button>
+  </div>
+</div>
+
+<!-- ── Auth Modal ── -->
+<div id="authModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:420px;">
+    <h2>Connecte-toi pour continuer</h2>
+    <p style="margin-bottom:20px;font-size:0.88rem;">Crée un compte gratuit et reçois 2 analyses offertes.</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Se connecter</button>
+      <button class="auth-tab" id="authTabRegister" onclick="switchAuthTab('register')">S'inscrire</button>
+    </div>
+    <div class="form-group"><input type="email" id="authEmail" placeholder="Email"></div>
+    <div class="form-group"><input type="password" id="authPassword" placeholder="Mot de passe"></div>
+    <button class="btn btn-primary btn-full" id="authSubmitBtn" onclick="doAuth()">Se connecter</button>
+    <p id="authMsg" style="font-size:0.85rem;color:var(--danger);text-align:center;margin-top:10px;min-height:20px;"></p>
+    <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="closeAuthModal()">Fermer</button>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+var selectedModel = "gpt-4o-mini";
+
+document.addEventListener("DOMContentLoaded", function() {
+  initNav();
+  checkPaymentReturn();
+  var user = getUser();
+  if (user) {
+    updateModelSelector();
+    updateQuota();
+  }
+  initDropZones();
+});
+
+function updateModelSelector() {
+  var user = getUser();
+  if (!user) {
+    ["gpt-4o-mini","gpt-4o","gemini","claude"].forEach(function(m) {
+      var b = document.getElementById("btn-"+m);
+      if (b) b.classList.add("locked");
+    });
+    return;
+  }
+  var plan = user.plan;
+  var allowed = MODELS_BY_PLAN[plan] || ["gpt-4o-mini"];
+  ["gpt-4o-mini","gpt-4o","gemini","claude"].forEach(function(m) {
+    var b = document.getElementById("btn-"+m);
+    if (!b) return;
+    if (allowed.indexOf(m) !== -1) b.classList.remove("locked");
+    else b.classList.add("locked");
+  });
+  if (allowed.indexOf(selectedModel) === -1) selectModel("gpt-4o-mini");
+}
+
+function selectModel(model) {
+  var user = getUser();
+  if (!user) { openAuthModal(); return; }
+  var allowed = MODELS_BY_PLAN[user.plan] || ["gpt-4o-mini"];
+  if (allowed.indexOf(model) === -1) { openUpgradeModal(); return; }
+  selectedModel = model;
+  ["gpt-4o-mini","gpt-4o","gemini","claude"].forEach(function(m) {
+    var b = document.getElementById("btn-"+m);
+    if (b) b.classList.remove("active");
+  });
+  var ab = document.getElementById("btn-"+model);
+  if (ab) ab.classList.add("active");
+  document.getElementById("modelUsedInfo").textContent = "Moteur : " + MODEL_INFO[model].label;
+}
+
+function updateQuota() {
+  var user = getUser();
+  if (!user) return;
+  var q = getQuota(user);
+  var bar = document.getElementById("quotaBar");
+  bar.style.display = "flex";
+  var pct = q.plan === "pro" ? 30 : Math.min(100, (q.used / q.limit) * 100);
+  document.getElementById("quotaLabel").textContent = q.plan === "pro" ? q.used + " analyses" : q.used + "/" + q.limit + " analyses";
+  document.getElementById("quotaFill").style.width = pct + "%";
+  document.getElementById("quotaFill").style.background = pct >= 90 ? "var(--danger)" : pct >= 60 ? "var(--warning)" : "var(--accent)";
+  document.getElementById("quotaMax").textContent = {free:"Gratuit", premium:"Premium", pro:"Pro"}[q.plan] || "";
+}
+
+function initDropZones() {
+  var dropHTF  = document.getElementById("dropHTF");
+  var dropLTF  = document.getElementById("dropLTF");
+  var imageHTF = document.getElementById("imageHTF");
+  var imageLTF = document.getElementById("imageLTF");
+
+  dropHTF.onclick = function() { if (!getUser()) { openAuthModal(); return; } imageHTF.click(); };
+  dropLTF.onclick = function() { if (!getUser()) { openAuthModal(); return; } imageLTF.click(); };
+  dropHTF.ondragover = function(e) { e.preventDefault(); };
+  dropLTF.ondragover = function(e) { e.preventDefault(); };
+  dropHTF.ondrop = function(e) { if (!getUser()) { openAuthModal(); return; } e.preventDefault(); imageHTF.files = e.dataTransfer.files; dropHTF.textContent = "✅ HTF chargée"; dropHTF.classList.add("loaded"); };
+  dropLTF.ondrop = function(e) { if (!getUser()) { openAuthModal(); return; } e.preventDefault(); imageLTF.files = e.dataTransfer.files; dropLTF.textContent = "✅ LTF chargée"; dropLTF.classList.add("loaded"); };
+  imageHTF.onchange = function() { if (imageHTF.files.length) { dropHTF.textContent = "✅ HTF chargée"; dropHTF.classList.add("loaded"); } };
+  imageLTF.onchange = function() { if (imageLTF.files.length) { dropLTF.textContent = "✅ LTF chargée"; dropLTF.classList.add("loaded"); } };
+}
+
+function resetForm() {
+  document.getElementById("imageHTF").value = "";
+  document.getElementById("imageLTF").value = "";
+  document.getElementById("dropHTF").textContent = "📈 Glissez ou cliquez pour uploader";
+  document.getElementById("dropLTF").textContent = "📉 Glissez ou cliquez pour uploader";
+  document.getElementById("dropHTF").classList.remove("loaded");
+  document.getElementById("dropLTF").classList.remove("loaded");
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("resultPlaceholder").classList.remove("hidden");
+  document.getElementById("asset").value = "";
+  document.getElementById("timeframe").value = "";
+}
+
+async function analyze() {
+  var user = getUser();
+  if (!user) { openAuthModal(); return; }
+
+  var imageHTF = document.getElementById("imageHTF");
+  var imageLTF = document.getElementById("imageLTF");
+  if (!imageHTF.files.length && !imageLTF.files.length) { alert("Ajoute au moins une image."); return; }
+
+  var loader = document.getElementById("loader");
+  loader.style.display = "block";
+
+  var formData = new FormData();
+  formData.append("email",    user.email);
+  formData.append("password", user.password);
+  formData.append("model",    selectedModel);
+  var asset = document.getElementById("asset").value;
+  var tf    = document.getElementById("timeframe").value;
+  if (asset) formData.append("asset", asset);
+  if (tf)    formData.append("timeframe", tf);
+  if (imageHTF.files.length) formData.append("image_htf", imageHTF.files[0]);
+  if (imageLTF.files.length) formData.append("image_ltf", imageLTF.files[0]);
+
+  try {
+    var res  = await fetch(API + "/analyze", { method: "POST", body: formData });
+    var data = await res.json();
+    if (data.error === "LIMIT_REACHED") { openUpgradeModal(); return; }
+    if (data.error) { alert("Erreur : " + data.error); return; }
+
+    user.analyses_utilisees = (user.analyses_utilisees || 0) + 1;
+    saveUser(user);
+    updateQuota();
+    renderResult(data);
+  } catch(e) {
+    alert("Erreur réseau : " + e.message);
+  } finally {
+    loader.style.display = "none";
+  }
+}
+
+function renderResult(data) {
+  var placeholder = document.getElementById("resultPlaceholder");
+  var result      = document.getElementById("result");
+  placeholder.classList.add("hidden");
+  result.classList.remove("hidden");
+
+  var dirClass = data.direction === "BUY" ? "badge-buy" : data.direction === "SELL" ? "badge-sell" : "badge-neutre";
+  var confluences = Array.isArray(data.confluences) ? data.confluences.map(function(c){ return "• " + c; }).join("<br>") : "-";
+  var entrees = Array.isArray(data.entrees) ? data.entrees.join(" / ") : (data.entrees || "-");
+  var tps     = Array.isArray(data.take_profit) ? data.take_profit.join(" / ") : (data.take_profit || "-");
+
+  var probaHtml = "";
+  if (data.probabilite_succes !== undefined && data.proba_couleur) {
+    probaHtml = '<div class="result-section">'
+      + '<div class="result-label">Probabilité de succès</div>'
+      + '<div class="proba-row">'
+      + '<span class="proba-dot" style="background:' + data.proba_couleur + '"></span>'
+      + '<span style="font-weight:700;color:' + data.proba_couleur + '">' + data.probabilite_succes + '% — ' + data.proba_label + '</span>'
+      + '</div></div>';
+  }
+
+  result.innerHTML = '<div class="result-box">'
+    + (data.modele ? '<div style="font-size:0.75em;color:var(--muted);text-align:right;margin-bottom:12px;">Moteur : ' + (MODEL_INFO[data.modele] ? MODEL_INFO[data.modele].label : data.modele) + '</div>' : '')
+    + '<div class="result-section"><div class="result-label">Direction</div>'
+    + '<span class="badge ' + dirClass + '" style="font-size:1em;padding:5px 14px;">' + data.direction + '</span>'
+    + (data.ratio_risque_rendement ? '<span style="margin-left:10px;color:var(--muted2);font-size:0.88em;">R/R ' + data.ratio_risque_rendement + '</span>' : '')
+    + '</div>'
+    + '<div class="result-section"><div class="result-label">Entrées</div>' + entrees + '</div>'
+    + '<div class="result-section"><div class="result-label">Stop Loss</div><span style="color:var(--danger);">' + (data.stop_loss||"-") + '</span></div>'
+    + '<div class="result-section"><div class="result-label">Take Profit</div><span style="color:var(--accent3);">' + tps + '</span></div>'
+    + (data.confluences ? '<div class="result-section"><div class="result-label">Confluences</div>' + confluences + '</div>' : '')
+    + (data.invalidation ? '<div class="result-section"><div class="result-label">Invalidation</div><span style="color:var(--warning);">' + data.invalidation + '</span></div>' : '')
+    + probaHtml
+    + '<hr class="divider">'
+    + '<div class="result-section"><div class="result-label">Analyse complète</div>' + (data.explication||"") + '</div>'
+    + '</div>';
+}
+</script>
+</body>
+</html>

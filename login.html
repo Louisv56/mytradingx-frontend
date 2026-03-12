@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — MyTradingX</title>
+<link rel="stylesheet" href="style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RSYYGQZ0MD"></script>
+<style>
+.login-page {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: 80px 20px;
+  background: radial-gradient(ellipse 60% 50% at 50% 0%, #38bdf810 0%, transparent 70%);
+}
+.login-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 40px;
+  width: 100%; max-width: 420px;
+}
+.login-logo {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem;
+  text-align: center; margin-bottom: 28px;
+  color: white;
+}
+.login-logo span { color: var(--accent); }
+.login-title { font-size: 1.3rem; text-align: center; margin-bottom: 6px; }
+.login-sub   { text-align: center; font-size: 0.88rem; margin-bottom: 24px; }
+.auth-msg { font-size: 0.85rem; text-align: center; min-height: 20px; color: var(--danger); margin-top: 10px; }
+.auth-msg.success { color: var(--accent3); }
+.divider-text {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--muted); font-size: 0.8rem; margin: 20px 0;
+}
+.divider-text::before, .divider-text::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.back-link { text-align: center; margin-top: 16px; font-size: 0.85rem; }
+.back-link a { color: var(--accent); text-decoration: none; }
+.free-badge {
+  background: #38bdf811; border: 1px solid #38bdf822;
+  border-radius: var(--radius); padding: 10px 14px;
+  text-align: center; font-size: 0.82rem; color: var(--accent);
+  margin-bottom: 20px;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">MyTrading<span>X</span></a>
+  <div class="nav-links">
+    <a href="index.html#features">Fonctionnalités</a>
+    <a href="index.html#pricing">Tarifs</a>
+  </div>
+  <div class="nav-right">
+    <a href="index.html" class="btn btn-secondary btn-sm">← Retour</a>
+  </div>
+</nav>
+
+<div class="login-page">
+  <div class="login-box">
+    <div class="login-logo">MyTrading<span>X</span></div>
+
+    <div class="free-badge">🎁 2 analyses offertes à l'inscription — Sans carte bancaire</div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Se connecter</button>
+      <button class="auth-tab" id="authTabRegister" onclick="switchAuthTab('register')">S'inscrire</button>
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="authEmail" placeholder="votre@email.com" onkeydown="if(event.key==='Enter') doAuth()">
+    </div>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" id="authPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter') doAuth()">
+    </div>
+
+    <button class="btn btn-primary btn-full mt-4" id="authSubmitBtn" onclick="doAuth()">Se connecter</button>
+
+    <p class="auth-msg" id="authMsg"></p>
+
+    <div class="back-link">
+      <a href="index.html">← Retour à l'accueil</a>
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Si déjà connecté → dashboard
+  if (getUser()) { window.location.href = "dashboard.html"; return; }
+
+  // Tab par défaut depuis URL
+  var params = new URLSearchParams(window.location.search);
+  if (params.get("tab") === "register") {
+    switchAuthTab("register");
+  }
+});
+</script>
+</body>
+</html>
