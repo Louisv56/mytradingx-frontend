@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Trading — Guides SMC, Order Blocks, FVG | MyTradingX</title>
+<meta name="description" content="Guides et tutoriels trading gratuits : Smart Money Concepts, Order Blocks, Fair Value Gap, BOS, CHOCH. Apprenez à trader comme les institutions.">
+<meta name="keywords" content="blog trading, smart money concepts guide, order blocks tutoriel, FVG trading, apprendre SMC, trading institutionnel">
+<meta name="author" content="MyTradingX">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Blog Trading SMC — Guides & Tutoriels | MyTradingX">
+<meta property="og:description" content="Guides trading gratuits : SMC, Order Blocks, FVG, BOS, CHOCH. Apprenez à trader comme les institutions.">
+<meta property="og:url" content="https://mytradingx.fr/blog.html">
+<meta property="og:image" content="https://mytradingx.fr/faviconmtx.png">
+<link rel="icon" type="image/png" href="faviconmtx.png">
+<link rel="stylesheet" href="style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RSYYGQZ0MD"></script>
+<style>
+.blog-index { padding: 88px 0 80px; }
+.blog-header { text-align: center; margin-bottom: 56px; }
+.blog-header p { max-width: 520px; margin: 12px auto 0; }
+.articles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.article-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  transition: all 0.3s; text-decoration: none; display: block;
+}
+.article-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+.article-card-thumb {
+  height: 140px; display: flex; align-items: center; justify-content: center;
+  font-size: 3rem; background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+.article-card-body { padding: 20px; }
+.article-card-cat { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.article-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: white; margin-bottom: 8px; line-height: 1.3; }
+.article-card-desc { font-size: 0.85rem; color: var(--muted2); line-height: 1.6; margin-bottom: 14px; }
+.article-card-meta { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); }
+.article-card.coming-soon { opacity: 0.5; pointer-events: none; }
+.coming-badge { background: var(--border); color: var(--muted2); padding: 2px 8px; border-radius: 10px; font-size: 0.72em; }
+@media (max-width: 900px) { .articles-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 580px) { .articles-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">MyTrading<span>X</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="analyse.html">Analyse</a>
+    <a href="fondamental.html">Fondamental</a>
+    <a href="blog.html" class="active">Blog</a>
+  </div>
+  <div class="nav-right">
+    <span id="navUser" class="nav-user hidden"></span>
+    <span id="navPlan" class="nav-plan hidden"></span>
+    <a href="login.html" id="navLogin" class="btn btn-outline btn-sm hidden">Connexion</a>
+    <button onclick="logout()" id="navLogout" class="btn btn-secondary btn-sm hidden">Déconnexion</button>
+  </div>
+</nav>
+
+<div class="blog-index">
+  <div class="container">
+
+    <div class="blog-header">
+      <div class="section-label" style="justify-content:center;">Ressources gratuites</div>
+      <h1>Blog Trading SMC</h1>
+      <p>Guides et tutoriels pour maîtriser le Smart Money Concepts et trader comme les institutions.</p>
+    </div>
+
+    <div class="articles-grid">
+
+      <!-- Article 1 — Publié -->
+      <a href="blog-smc.html" class="article-card">
+        <div class="article-card-thumb">🧠</div>
+        <div class="article-card-body">
+          <div class="article-card-cat">Guide Trading</div>
+          <div class="article-card-title">C'est quoi le Smart Money Concepts (SMC) ?</div>
+          <div class="article-card-desc">Découvrez la méthode de trading des institutions : structure, Order Blocks, FVG, liquidité. Le guide complet pour débuter en SMC.</div>
+          <div class="article-card-meta">
+            <span>📅 Janvier 2025</span>
+            <span>⏱ 8 min</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Article 2 — À venir -->
+      <div class="article-card coming-soon">
+        <div class="article-card-thumb">📦</div>
+        <div class="article-card-body">
+          <div class="article-card-cat">Guide Trading <span class="coming-badge">Bientôt</span></div>
+          <div class="article-card-title">Order Blocks : comment les identifier et les trader</div>
+          <div class="article-card-desc">Guide complet sur les Order Blocks — la zone clé du SMC. Comment les trouver, les valider et les utiliser pour entrer en position.</div>
+          <div class="article-card-meta">
+            <span>📅 Prochainement</span>
+            <span>⏱ ~7 min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article 3 — À venir -->
+      <div class="article-card coming-soon">
+        <div class="article-card-thumb">🕳️</div>
+        <div class="article-card-body">
+          <div class="article-card-cat">Guide Trading <span class="coming-badge">Bientôt</span></div>
+          <div class="article-card-title">Fair Value Gap (FVG) : stratégie complète</div>
+          <div class="article-card-desc">Qu'est-ce qu'un Fair Value Gap et comment l'utiliser pour trader les déséquilibres de marché ? Tout ce qu'il faut savoir.</div>
+          <div class="article-card-meta">
+            <span>📅 Prochainement</span>
+            <span>⏱ ~6 min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article 4 — À venir -->
+      <div class="article-card coming-soon">
+        <div class="article-card-thumb">🔄</div>
+        <div class="article-card-body">
+          <div class="article-card-cat">Guide Trading <span class="coming-badge">Bientôt</span></div>
+          <div class="article-card-title">BOS et CHOCH : détecter les retournements</div>
+          <div class="article-card-desc">Break of Structure et Change of Character — les deux outils essentiels pour identifier les continuations et retournements de tendance.</div>
+          <div class="article-card-meta">
+            <span>📅 Prochainement</span>
+            <span>⏱ ~6 min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article 5 — À venir -->
+      <div class="article-card coming-soon">
+        <div class="article-card-thumb">🤖</div>
+        <div class="article-card-body">
+          <div class="article-card-cat">IA & Trading <span class="coming-badge">Bientôt</span></div>
+          <div class="article-card-title">Comment analyser un graphique de trading avec l'IA</div>
+          <div class="article-card-desc">Découvrez comment utiliser l'intelligence artificielle pour automatiser votre analyse SMC et gagner du temps sur vos sessions de trading.</div>
+          <div class="article-card-meta">
+            <span>📅 Prochainement</span>
+            <span>⏱ ~5 min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article 6 — À venir -->
+      <div class="article-card coming-soon">
+        <div class="article-card-thumb">💧</div>
+        <div class="article-card-body">
+          <div class="article-card-cat">Guide Trading <span class="coming-badge">Bientôt</span></div>
+          <div class="article-card-title">Liquidité en trading : BSL, SSL et Equal Highs</div>
+          <div class="article-card-desc">Comprendre la liquidité est la clé du SMC. Découvrez comment les institutions chassent les stops et comment en profiter.</div>
+          <div class="article-card-meta">
+            <span>📅 Prochainement</span>
+            <span>⏱ ~7 min</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<footer style="padding:32px 0;border-top:1px solid var(--border);text-align:center;color:var(--muted);font-size:0.82rem;">
+  <div class="container">
+    <p>© 2025 MyTradingX · <a href="#" style="color:var(--muted2);text-decoration:none;">Mentions légales</a> · Ceci n'est pas un conseil financier.</p>
+  </div>
+</footer>
+
+<script src="auth.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  initNav();
+});
+</script>
+</body>
+</html>
