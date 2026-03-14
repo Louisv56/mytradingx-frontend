@@ -147,12 +147,14 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
+// redirect_uri fixe — doit être identique partout (ici, Google Cloud et backend)
+var REDIRECT_URI = "https://mytradingx.fr/login.html";
+
 function loginWithGoogle() {
-  var redirectUri = encodeURIComponent(window.location.origin + "/login.html");
-  var scope       = encodeURIComponent("email profile openid");
+  var scope = encodeURIComponent("email profile openid");
   var url = "https://accounts.google.com/o/oauth2/v2/auth"
     + "?client_id=" + GOOGLE_CLIENT_ID
-    + "&redirect_uri=" + redirectUri
+    + "&redirect_uri=" + encodeURIComponent(REDIRECT_URI)
     + "&response_type=code"
     + "&scope=" + scope
     + "&access_type=offline"
@@ -167,7 +169,7 @@ async function handleGoogleCode(code) {
     var res  = await fetch(API + "/auth/google/callback", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({code})
+      body: JSON.stringify({code: code, redirect_uri: REDIRECT_URI})
     });
     var data = await res.json();
     if (data.error) {
