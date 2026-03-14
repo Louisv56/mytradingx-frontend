@@ -220,12 +220,12 @@ def login():
 def google_callback():
     try:
         data = request.get_json()
-        code = data.get("code", "")
+        code         = data.get("code", "")
+        redirect_uri = data.get("redirect_uri", FRONTEND_URL + "/login.html")
         if not code:
             return jsonify({"error": "Code manquant"}), 400
 
         # 1. Echanger le code contre un access_token
-        redirect_uri = FRONTEND_URL + "/login.html"
         token_data = urllib.parse.urlencode({
             "code":          code,
             "client_id":     GOOGLE_CLIENT_ID,
