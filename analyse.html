@@ -22,7 +22,19 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-RSYYGQZ0MD"></script>
 <style>
 .analyse-page { padding: 88px 0 60px; }
-.analyse-layout { display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start; }
+.analyse-layout { display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
+.drop-zone-main { min-height: 130px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+.btn-multitf {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: 1px dashed var(--border);
+  color: var(--muted2); font-size: 0.8rem; padding: 6px 12px;
+  border-radius: var(--radius); cursor: pointer; margin-top: 8px;
+  width: 100%; justify-content: center; transition: all 0.2s;
+}
+.btn-multitf:hover { border-color: var(--accent); color: var(--accent); }
+.btn-multitf.active { border-color: var(--accent); color: var(--accent); background: #38bdf810; }
+.multitf-zone { display: none; }
+.multitf-zone.open { display: block; }
 .panel-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .news-item { background: var(--bg2); border-radius: var(--radius); padding: 10px 12px; margin: 6px 0; }
 .news-impact { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72em; font-weight: 700; margin-bottom: 4px; }
@@ -116,14 +128,23 @@
 
           <!-- Upload zones -->
           <div class="form-group">
-            <label>High TimeFrame (M15 · H1 · H4)</label>
-            <div class="drop-zone" id="dropHTF">📈 Glissez ou cliquez pour uploader</div>
+            <label>Graphique</label>
+            <div class="drop-zone drop-zone-main" id="dropHTF">📈 Glissez ou cliquez pour uploader</div>
             <input type="file" id="imageHTF" accept="image/*" class="hidden">
           </div>
-          <div class="form-group">
-            <label>Low TimeFrame (M1 · M5 · M15)</label>
-            <div class="drop-zone" id="dropLTF">📉 Glissez ou cliquez pour uploader</div>
-            <input type="file" id="imageLTF" accept="image/*" class="hidden">
+
+          <!-- Bouton multi-timeframe -->
+          <button class="btn-multitf" id="btnMultiTF" onclick="toggleMultiTF()">
+            <span id="multitfIcon">＋</span> Ajouter un 2ème graphique (Multi-timeframe)
+          </button>
+
+          <!-- Zone LTF cachée par défaut -->
+          <div class="multitf-zone" id="multitfZone">
+            <div class="form-group" style="margin-top:10px;">
+              <label>Low TimeFrame (M1 · M5 · M15)</label>
+              <div class="drop-zone" id="dropLTF">📉 Glissez ou cliquez pour uploader</div>
+              <input type="file" id="imageLTF" accept="image/*" class="hidden">
+            </div>
           </div>
 
           <button class="btn btn-primary btn-full mt-4" onclick="analyze()">Analyser</button>
@@ -258,6 +279,21 @@ function updateQuota() {
   document.getElementById("quotaMax").textContent = {free:"Gratuit", premium:"Premium", pro:"Pro"}[q.plan] || "";
 }
 
+function toggleMultiTF() {
+  var zone = document.getElementById("multitfZone");
+  var btn  = document.getElementById("btnMultiTF");
+  var icon = document.getElementById("multitfIcon");
+  var open = zone.classList.toggle("open");
+  btn.classList.toggle("active", open);
+  icon.textContent = open ? "−" : "＋";
+  if (!open) {
+    // Vider le LTF si on ferme
+    document.getElementById("imageLTF").value = "";
+    document.getElementById("dropLTF").textContent = "📉 Glissez ou cliquez pour uploader";
+    document.getElementById("dropLTF").classList.remove("loaded");
+  }
+}
+
 function initDropZones() {
   var dropHTF  = document.getElementById("dropHTF");
   var dropLTF  = document.getElementById("dropLTF");
@@ -281,6 +317,10 @@ function resetForm() {
   document.getElementById("dropLTF").textContent = "📉 Glissez ou cliquez pour uploader";
   document.getElementById("dropHTF").classList.remove("loaded");
   document.getElementById("dropLTF").classList.remove("loaded");
+  // Refermer le multi-TF
+  document.getElementById("multitfZone").classList.remove("open");
+  document.getElementById("btnMultiTF").classList.remove("active");
+  document.getElementById("multitfIcon").textContent = "＋";
   document.getElementById("result").innerHTML = "";
   document.getElementById("result").classList.add("hidden");
   document.getElementById("resultPlaceholder").classList.remove("hidden");
