@@ -37,7 +37,21 @@ GOOGLE_TOKEN_URL     = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL  = "https://www.googleapis.com/oauth2/v2/userinfo"
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": [
+    "https://mytradingx.fr",
+    "https://www.mytradingx.fr",
+    "http://localhost",
+    "http://127.0.0.1"
+]}}, supports_credentials=True)
+
+@app.after_request
+def after_request(response):
+    origin = request.headers.get("Origin", "")
+    if origin in ["https://mytradingx.fr", "https://www.mytradingx.fr"]:
+        response.headers["Access-Control-Allow-Origin"]  = origin
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
+        response.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
+    return response
 
 # ── Modeles autorises par plan ────────────────────────────────────────────────
 MODELS_BY_PLAN = {
@@ -161,8 +175,9 @@ def call_gemini(prompt, images):
     return clean_json(response.text)
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
-@app.route("/register", methods=["POST"])
+@app.route("/register", methods=["POST", "OPTIONS"])
 def register():
+    if request.method == "OPTIONS": return "", 204
     try:
         data     = request.get_json()
         email    = data.get("email", "").strip().lower()
@@ -187,8 +202,9 @@ def register():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["POST", "OPTIONS"])
 def login():
+    if request.method == "OPTIONS": return "", 204
     try:
         data     = request.get_json()
         email    = data.get("email", "").strip().lower()
@@ -216,8 +232,10 @@ def login():
 
 
 # ── Google OAuth ─────────────────────────────────────────────────────────────
-@app.route("/auth/google/callback", methods=["POST"])
+@app.route("/auth/google/callback", methods=["POST", "OPTIONS"])
 def google_callback():
+    if request.method == "OPTIONS":
+        return "", 204
     try:
         data = request.get_json()
         code         = data.get("code", "")
@@ -296,8 +314,9 @@ def google_callback():
 
 
 # ── Analyse ───────────────────────────────────────────────────────────────────
-@app.route("/analyze", methods=["POST"])
+@app.route("/analyze", methods=["POST", "OPTIONS"])
 def analyze():
+    if request.method == "OPTIONS": return "", 204
     try:
         email    = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
@@ -378,8 +397,9 @@ def analyze():
 
 
 # ── Cancel Subscription ───────────────────────────────────────────────────────
-@app.route("/cancel-subscription", methods=["POST"])
+@app.route("/cancel-subscription", methods=["POST", "OPTIONS"])
 def cancel_subscription():
+    if request.method == "OPTIONS": return "", 204
     try:
         data     = request.get_json()
         email    = data.get("email", "").strip().lower()
@@ -397,8 +417,9 @@ def cancel_subscription():
 
 
 # ── Stripe Checkout ───────────────────────────────────────────────────────────
-@app.route("/create-checkout", methods=["POST"])
+@app.route("/create-checkout", methods=["POST", "OPTIONS"])
 def create_checkout():
+    if request.method == "OPTIONS": return "", 204
     try:
         data  = request.get_json()
         email = data.get("email", "").strip().lower()
@@ -429,7 +450,7 @@ def create_checkout():
 
 
 # ── Stripe Webhook ────────────────────────────────────────────────────────────
-@app.route("/webhook", methods=["POST"])
+@app.route("/webhook", methods=["POST", "OPTIONS"])
 def webhook():
     payload = request.data
     sig     = request.headers.get("Stripe-Signature")
@@ -457,8 +478,9 @@ def webhook():
 
 
 # ── Analyse Fondamentale (Pro uniquement) ─────────────────────────────────────
-@app.route("/fundamental", methods=["POST"])
+@app.route("/fundamental", methods=["POST", "OPTIONS"])
 def fundamental():
+    if request.method == "OPTIONS": return "", 204
     try:
         import requests as req
 
