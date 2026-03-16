@@ -237,6 +237,7 @@ def google_callback():
     if request.method == "OPTIONS":
         return "", 204
     try:
+        import requests as req_lib
         data = request.get_json()
         code         = data.get("code", "")
         redirect_uri = data.get("redirect_uri", FRONTEND_URL + "/login.html")
@@ -244,32 +245,23 @@ def google_callback():
             return jsonify({"error": "Code manquant"}), 400
 
         # 1. Echanger le code contre un access_token
-        token_data = urllib.parse.urlencode({
+        token_resp = req_lib.post(GOOGLE_TOKEN_URL, data={
             "code":          code,
             "client_id":     GOOGLE_CLIENT_ID,
             "client_secret": GOOGLE_CLIENT_SECRET,
             "redirect_uri":  redirect_uri,
             "grant_type":    "authorization_code"
-        }).encode()
-
-        token_req = urllib.request.Request(
-            GOOGLE_TOKEN_URL,
-            data=token_data,
-            headers={"Content-Type": "application/x-www-form-urlencoded"}
-        )
-        token_resp = urllib.request.urlopen(token_req)
-        token_json = json.loads(token_resp.read().decode())
+        }, timeout=10)
+        token_json   = token_resp.json()
         access_token = token_json.get("access_token")
         if not access_token:
-            return jsonify({"error": "Token Google invalide"}), 400
+            err_desc = token_json.get("error_description", token_json.get("error", "Token Google invalide"))
+            return jsonify({"error": err_desc}), 400
 
         # 2. Recuperer les infos utilisateur Google
-        info_req  = urllib.request.Request(
-            GOOGLE_USERINFO_URL,
-            headers={"Authorization": "Bearer " + access_token}
-        )
-        info_resp = urllib.request.urlopen(info_req)
-        info      = json.loads(info_resp.read().decode())
+        info_resp = req_lib.get(GOOGLE_USERINFO_URL,
+            headers={"Authorization": "Bearer " + access_token}, timeout=10)
+        info      = info_resp.json()
         email     = info.get("email", "").strip().lower()
         if not email:
             return jsonify({"error": "Email Google introuvable"}), 400
@@ -323,7 +315,11 @@ def analyze():
         model    = request.form.get("model", "gpt-4o-mini")
 
         user = get_user(email)
-        if not user or user["password"] != hash_password(password):
+        if not user:
+            return jsonify({"error": "Non autorise. Connecte-toi."}), 401
+        # Support Google Auth : le frontend envoie "GOOGLE_AUTH" comme password
+        google_password_hash = hash_password("GOOGLE_OAUTH_" + hashlib.sha256(email.encode()).hexdigest()[:16])
+        if user["password"] != hash_password(password) and user["password"] != google_password_hash:
             return jsonify({"error": "Non autorise. Connecte-toi."}), 401
 
         user  = reset_counter_if_needed(user)
@@ -405,7 +401,10 @@ def cancel_subscription():
         email    = data.get("email", "").strip().lower()
         password = data.get("password", "")
         user = get_user(email)
-        if not user or user["password"] != hash_password(password):
+        if not user:
+            return jsonify({"error": "Non autorise"}), 401
+        google_password_hash = hash_password("GOOGLE_OAUTH_" + hashlib.sha256(email.encode()).hexdigest()[:16])
+        if user["password"] != hash_password(password) and user["password"] != google_password_hash:
             return jsonify({"error": "Non autorise"}), 401
         sub_id = user.get("stripe_subscription_id")
         if not sub_id:
@@ -493,7 +492,10 @@ def fundamental():
             return jsonify({"error": "Precise un actif (ex: BTC, EURUSD, Gold)"}), 400
 
         user = get_user(email)
-        if not user or user["password"] != hash_password(password):
+        if not user:
+            return jsonify({"error": "Non autorise. Connecte-toi."}), 401
+        google_password_hash = hash_password("GOOGLE_OAUTH_" + hashlib.sha256(email.encode()).hexdigest()[:16])
+        if user["password"] != hash_password(password) and user["password"] != google_password_hash:
             return jsonify({"error": "Non autorise. Connecte-toi."}), 401
 
         if user["plan"] != "pro":
