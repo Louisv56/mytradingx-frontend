@@ -37,6 +37,14 @@ function requireAuth() {
   return true;
 }
 
+function maskEmail(email) {
+  var parts = email.split("@");
+  var name   = parts[0];
+  var domain = parts[1];
+  if (name.length <= 2) return name[0] + "***@" + domain;
+  return name[0] + name[1] + "***" + name[name.length - 1] + "@" + domain;
+}
+
 // ── Nav ───────────────────────────────────────────────────────────────────────
 function initNav() {
   var user = getUser();
@@ -46,7 +54,7 @@ function initNav() {
   var navLogout  = document.getElementById("navLogout");
 
   if (user) {
-    if (navUser)   { navUser.textContent = user.email; navUser.classList.remove("hidden"); }
+    if (navUser)   { navUser.textContent = maskEmail(user.email); navUser.classList.remove("hidden"); }
     if (navPlan)   {
       var labels = {free:"FREE", premium:"PREMIUM", pro:"PRO"};
       var classes = {free:"plan-free", premium:"plan-premium", pro:"plan-pro"};
