@@ -96,8 +96,15 @@ tr:hover td { background: var(--card); }
 .toc {
   background: var(--card); border: 1px solid var(--border);
   border-radius: var(--radius-lg); padding: 24px;
-  position: sticky; top: 88px;
 }
+aside {
+  position: sticky; top: 88px;
+  align-self: start;
+  max-height: calc(100vh - 108px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+aside::-webkit-scrollbar { display: none; }
 .toc h4 { font-family: 'Syne', sans-serif; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 14px; }
 .toc ol  { margin-left: 16px; }
 .toc li  { margin-bottom: 8px; }
