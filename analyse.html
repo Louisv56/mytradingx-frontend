@@ -19,6 +19,7 @@
 <meta name="twitter:description" content="Obtenez un setup SMC complet en 10 secondes. Order Blocks, FVG, entrées précises, Stop Loss, Take Profit et probabilité de succès calculés par l'IA.">
 <link rel="icon" type="image/png" href="faviconmtx.png">
 <link rel="stylesheet" href="style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RSYYGQZ0MD"></script>
 <style>
 .analyse-page { padding: 88px 0 60px; }
 .analyse-layout { display: grid; grid-template-columns: 1fr 450px; gap: 24px; align-items: start; }
@@ -34,6 +35,14 @@
 .btn-multitf.active { border-color: var(--accent); color: var(--accent); background: #38bdf810; }
 .multitf-zone { display: none; }
 .multitf-zone.open { display: block; }
+.btn-result {
+  padding: 8px 16px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg2);
+  color: var(--muted2); font-family: 'DM Sans', sans-serif;
+  font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+}
+.btn-result:hover { border-color: var(--accent); color: var(--text); }
+.btn-result.active-result { border-color: var(--accent); background: #38bdf815; color: var(--accent); }
 .panel-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .news-item { background: var(--bg2); border-radius: var(--radius); padding: 10px 12px; margin: 6px 0; }
 .news-impact { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72em; font-weight: 700; margin-bottom: 4px; }
@@ -52,6 +61,7 @@
   <div class="nav-links">
     <a href="dashboard.html">Dashboard</a>
     <a href="analyse.html" class="active">Analyse</a>
+    <a href="historique.html">Historique</a>
     <a href="fondamental.html">Fondamental</a>
     <a href="blog.html">Blog</a>
   </div>
@@ -358,7 +368,8 @@ async function analyze() {
     user.analyses_utilisees = (user.analyses_utilisees || 0) + 1;
     saveUser(user);
     updateQuota();
-    renderResult(data);
+    renderResult(data, document.getElementById("asset").value, document.getElementById("timeframe").value);
+    saveAnalysis(data, document.getElementById("asset").value, document.getElementById("timeframe").value);
   } catch(e) {
     alert("Erreur réseau : " + e.message);
   } finally {
@@ -366,7 +377,31 @@ async function analyze() {
   }
 }
 
-function renderResult(data) {
+async function saveAnalysis(data, asset, timeframe) {
+  var user = getUser();
+  if (!user) return;
+  try {
+    await fetch(API + "/save-analysis", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        email:       user.email,
+        password:    user.password,
+        asset:       asset,
+        timeframe:   timeframe,
+        modele:      data.modele || "",
+        direction:   data.direction || "",
+        entrees:     data.entrees || "",
+        stop_loss:   data.stop_loss || "",
+        take_profit: data.take_profit || "",
+        probabilite: data.probabilite_succes || null,
+        explication: data.explication || ""
+      })
+    });
+  } catch(e) { /* silencieux */ }
+}
+
+function renderResult(data, asset, timeframe) {
   var placeholder = document.getElementById("resultPlaceholder");
   var result      = document.getElementById("result");
   placeholder.classList.add("hidden");
@@ -401,7 +436,62 @@ function renderResult(data) {
     + probaHtml
     + '<hr class="divider">'
     + '<div class="result-section"><div class="result-label">Analyse complète</div>' + (data.explication||"") + '</div>'
+    + '<hr class="divider">'
+    + '<div class="result-label" style="margin-bottom:10px;">Ce trade s\'est-il bien passé ?</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+    + '<button onclick="setTradeResult(\'win\')" class="btn-result" id="btn-win">✅ Gagné</button>'
+    + '<button onclick="setTradeResult(\'loss\')" class="btn-result" id="btn-loss">❌ Perdu</button>'
+    + '<button onclick="setTradeResult(\'skip\')" class="btn-result" id="btn-skip">⏭ Non pris</button>'
+    + '</div>'
+    + '<div id="tradeNoteZone" style="display:none;margin-top:10px;">'
+    + '<input type="text" id="tradeNoteInput" placeholder="Ajouter une note (optionnel)..." style="margin-bottom:8px;">'
+    + '<button onclick="saveTradeResult()" class="btn btn-primary btn-sm btn-full">Enregistrer</button>'
+    + '</div>'
+    + '<div id="tradeResultMsg" style="font-size:0.82rem;color:var(--accent3);margin-top:8px;min-height:18px;"></div>'
     + '</div>';
+
+  // Stocker l'id de la dernière analyse sauvegardée (récupéré après save)
+  window._lastTradeResult = null;
+}
+
+var _pendingTradeResult = null;
+
+function setTradeResult(val) {
+  _pendingTradeResult = val;
+  document.querySelectorAll(".btn-result").forEach(function(b) { b.classList.remove("active-result"); });
+  var btn = document.getElementById("btn-" + val);
+  if (btn) btn.classList.add("active-result");
+  document.getElementById("tradeNoteZone").style.display = "block";
+}
+
+async function saveTradeResult() {
+  var user = getUser();
+  if (!user || !_pendingTradeResult) return;
+  var note = document.getElementById("tradeNoteInput").value;
+  var msg  = document.getElementById("tradeResultMsg");
+
+  // Récupérer l'id de la dernière analyse
+  try {
+    var histRes = await fetch(API + "/get-history", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({email: user.email, password: user.password})
+    });
+    var histData = await histRes.json();
+    if (!histData.analyses || !histData.analyses.length) { msg.textContent = "Analyse introuvable."; return; }
+    var lastId = histData.analyses[0].id;
+
+    await fetch(API + "/update-trade-result", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({email: user.email, password: user.password, id: lastId, trade_result: _pendingTradeResult, trade_note: note})
+    });
+    var labels = {win:"✅ Trade gagné enregistré !", loss:"❌ Trade perdu enregistré.", skip:"⏭ Trade non pris enregistré."};
+    msg.textContent = labels[_pendingTradeResult] || "Enregistré !";
+    document.getElementById("tradeNoteZone").style.display = "none";
+  } catch(e) {
+    msg.textContent = "Erreur lors de l'enregistrement.";
+  }
 }
 </script>
 </body>
