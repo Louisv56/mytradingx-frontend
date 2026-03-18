@@ -215,11 +215,33 @@ function getQuota(user) {
   return {plan, used, limit, left};
 }
 
-// ── Google Analytics ──────────────────────────────────────────────────────────
+// ── Google Analytics — chargé uniquement si accepté ───────────────────────────
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-RSYYGQZ0MD');
+
+function loadGA() {
+  if (window._gaLoaded) return;
+  window._gaLoaded = true;
+  var s = document.createElement("script");
+  s.async = true;
+  s.src = "https://www.googletagmanager.com/gtag/js?id=G-RSYYGQZ0MD";
+  document.head.appendChild(s);
+  s.onload = function() {
+    gtag('js', new Date());
+    gtag('config', 'G-RSYYGQZ0MD');
+  };
+}
+
+// Si l'utilisateur a déjà donné son consentement analytics → charger GA
+(function() {
+  var consent = localStorage.getItem("cookieConsent");
+  if (consent) {
+    try {
+      var prefs = JSON.parse(consent);
+      if (prefs.analytics) loadGA();
+    } catch(e) {}
+  }
+})();
 
 // ── Cookie Consent ────────────────────────────────────────────────────────────
 (function() {
@@ -390,6 +412,7 @@ gtag('config', 'G-RSYYGQZ0MD');
 
   function closeConsent(prefs) {
     localStorage.setItem("cookieConsent", JSON.stringify(prefs));
+    if (prefs.analytics) loadGA();
     var overlay = document.getElementById("cookieOverlay");
     if (overlay) {
       overlay.style.opacity = "0";
