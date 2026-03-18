@@ -3,66 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mon Dashboard — MyTradingX</title>
-<meta name="description" content="Gérez votre compte MyTradingX. Suivez vos analyses, votre quota mensuel et votre abonnement.">
-<meta name="keywords" content="dashboard mytradingx, compte trading IA, abonnement analyse trading">
+<title>Analyse Fondamentale Trading IA — Actualités Marchés | MyTradingX</title>
+<meta name="description" content="MytAI analyse l'actualité financière du jour pour déterminer si le marché est haussier ou baissier. Sentiment de marché en temps réel pour le Forex, Crypto, Indices et Matières premières.">
+<meta name="keywords" content="analyse fondamentale trading, sentiment marché IA, actualité forex crypto, analyse news trading, marché haussier baissier, analyse fondamentale automatique">
 <meta name="author" content="MyTradingX">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MyTradingX">
-<meta property="og:title" content="Mon Dashboard — MyTradingX">
-<meta property="og:description" content="Gérez votre compte et vos analyses de trading.">
-<meta property="og:url" content="https://mytradingx.fr/dashboard.html">
+<meta property="og:title" content="Analyse Fondamentale IA — Sentiment de Marché | MyTradingX">
+<meta property="og:description" content="L'IA analyse l'actualité financière du jour et détermine si le marché est haussier ou baissier. Forex, Crypto, Indices, Or, Pétrole.">
+<meta property="og:url" content="https://mytradingx.fr/fondamental.html">
 <meta property="og:image" content="https://mytradingx.fr/faviconmtx.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Mon Dashboard — MyTradingX">
-<meta name="twitter:description" content="Gérez votre compte et vos analyses de trading.">
+<meta name="twitter:title" content="Analyse Fondamentale IA — Sentiment de Marché | MyTradingX">
+<meta name="twitter:description" content="L'IA analyse l'actualité financière du jour et détermine si le marché est haussier ou baissier. Forex, Crypto, Indices, Or, Pétrole.">
 <link rel="icon" type="image/png" href="faviconmtx.png">
 <link rel="stylesheet" href="style.css">
 <style>
-.dashboard { padding: 88px 0 60px; }
-.dash-header { margin-bottom: 32px; }
-.dash-greeting { font-size: 0.88rem; color: var(--muted2); margin-bottom: 4px; }
-.dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
-.stat-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 22px;
+.fond-page { padding: 88px 0 60px; }
+.fond-layout { display: grid; grid-template-columns: 360px 1fr; gap: 24px; align-items: start; }
+.news-item { background: var(--bg2); border-radius: var(--radius); padding: 12px 14px; margin: 8px 0; }
+.news-impact { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72em; font-weight: 700; margin-bottom: 6px; }
+.impact-pos { background: #16a34a33; color: #22c55e; }
+.impact-neg { background: #dc262633; color: #f87171; }
+.impact-neu { background: #ca8a0433; color: #facc15; }
+.sentiment-badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 1.1em;
 }
-.stat-card-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-.stat-card-value { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: white; }
-.stat-card-sub   { font-size: 0.8rem; color: var(--muted2); margin-top: 4px; }
-.dash-main { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-.plan-features { list-style: none; margin: 16px 0; }
-.plan-features li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; color: var(--muted2); display: flex; align-items: center; gap: 8px; }
-.plan-features li:last-child { border-bottom: none; }
-.plan-features li::before { content: "✓"; color: var(--accent3); font-weight: 700; }
-.quick-actions { display: flex; flex-direction: column; gap: 10px; }
-.quick-btn {
-  display: flex; align-items: center; gap: 12px;
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px 16px;
-  color: var(--text); text-decoration: none;
-  transition: all 0.2s; cursor: pointer;
+.facteur-item { padding: 4px 0; color: var(--muted2); font-size: 0.88rem; }
+.facteur-item::before { content: "→ "; color: var(--accent); }
+.pro-lock-banner {
+  background: var(--card); border: 2px dashed var(--accent2)55;
+  border-radius: var(--radius-lg); padding: 48px 24px;
+  text-align: center;
 }
-.quick-btn:hover { border-color: var(--accent); background: #38bdf808; }
-.quick-btn-icon { font-size: 1.2rem; }
-.quick-btn-text { font-weight: 600; font-size: 0.9rem; }
-.quick-btn-sub  { font-size: 0.78rem; color: var(--muted2); }
-.upgrade-banner {
-  background: linear-gradient(135deg, #7c3aed15, #38bdf815);
-  border: 1px solid var(--accent2)33;
-  border-radius: var(--radius-lg); padding: 24px;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  margin-top: 20px; flex-wrap: wrap;
-}
-.upgrade-banner h3 { margin-bottom: 4px; }
-.upgrade-banner p  { font-size: 0.88rem; }
-@media (max-width: 768px) {
-  .dash-grid { grid-template-columns: 1fr 1fr; }
-  .dash-main { grid-template-columns: 1fr; }
-}
-@media (max-width: 480px) {
-  .dash-grid { grid-template-columns: 1fr; }
+.pro-lock-banner h2 { color: #a78bfa; margin-bottom: 8px; }
+.pro-lock-banner p  { margin-bottom: 24px; }
+@media (max-width: 900px) {
+  .fond-layout { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -71,97 +50,74 @@
 <nav>
   <a href="index.html" class="nav-logo">MyTrading<span>X</span></a>
   <div class="nav-links">
-    <a href="dashboard.html" class="active">Dashboard</a>
+    <a href="dashboard.html">Dashboard</a>
     <a href="analyse.html">Analyse</a>
-    <a href="fondamental.html">Fondamental</a>
+    <a href="fondamental.html" class="active">Fondamental</a>
     <a href="blog.html">Blog</a>
   </div>
   <div class="nav-right">
     <span id="navUser" class="nav-user hidden"></span>
     <span id="navPlan" class="nav-plan hidden"></span>
+    <a href="login.html" id="navLogin" class="btn btn-outline btn-sm hidden">Connexion</a>
     <button onclick="logout()" id="navLogout" class="btn btn-secondary btn-sm hidden">Déconnexion</button>
   </div>
 </nav>
 
-<div class="dashboard">
+<div class="fond-page">
   <div class="container">
 
-    <div class="dash-header">
-      <div class="dash-greeting">Bonjour 👋</div>
-      <h1 id="dashTitle">Mon Dashboard</h1>
+    <div style="margin-bottom:24px;">
+      <div class="section-label">MytAI <span class="badge badge-pro-tag">PRO</span></div>
+      <h1>Analyse Fondamentale</h1>
+      <p style="margin-top:8px;">MytAI analyse l'actualité du jour pour déterminer si le marché est haussier ou baissier.</p>
     </div>
 
-    <!-- Stats -->
-    <div class="dash-grid">
-      <div class="stat-card">
-        <div class="stat-card-label">Analyses effectuées</div>
-        <div class="stat-card-value" id="statUsed">—</div>
-        <div class="stat-card-sub" id="statUsedSub"></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-label">Analyses restantes</div>
-        <div class="stat-card-value" id="statLeft">—</div>
-        <div class="stat-card-sub" id="statLeftSub"></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-label">Mon plan</div>
-        <div class="stat-card-value" id="statPlan">—</div>
-        <div class="stat-card-sub" id="statPlanSub"></div>
-      </div>
+    <!-- Si pas Pro → banner lock -->
+    <div id="proLockBanner" class="pro-lock-banner hidden">
+      <div style="font-size:3rem;margin-bottom:16px;">🔒</div>
+      <h2>Fonctionnalité Pro</h2>
+      <p>L'analyse fondamentale est réservée aux abonnés Pro.<br>Passez au plan Pro pour accéder à l'actualité des marchés en temps réel.</p>
+      <button class="btn btn-pro btn-lg" onclick="openUpgradeModal()">Passer au plan Pro — 19€/mois</button>
+      <p style="margin-top:12px;font-size:0.78rem;">Prix de lancement · Sans engagement</p>
     </div>
 
-    <!-- Quota bar -->
-    <div class="quota-bar mb-4" id="quotaBarDash">
-      <span id="quotaLabelDash" style="white-space:nowrap;font-size:0.85rem;"></span>
-      <div class="quota-track"><div class="quota-fill" id="quotaFillDash"></div></div>
-      <span id="quotaMaxDash" style="white-space:nowrap;font-size:0.82rem;color:var(--muted2);"></span>
-    </div>
+    <!-- Interface fondamentale (Pro uniquement) -->
+    <div id="fondContent" class="hidden">
+      <div class="fond-layout">
 
-    <div class="dash-main">
-      <!-- Left: plan info -->
-      <div>
-        <div class="card">
-          <h3>Mon abonnement</h3>
-          <ul class="plan-features" id="planFeatures"></ul>
-          <div id="planActions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;"></div>
-        </div>
-
-        <!-- Upgrade banner (si free ou premium) -->
-        <div class="upgrade-banner" id="upgradeBanner" style="display:none;">
-          <div>
-            <h3>Passez au niveau supérieur</h3>
-            <p>Débloquez plus d'analyses et de moteurs MytAI.</p>
-          </div>
-          <button class="btn btn-pro" onclick="openUpgradeModal()">Voir les offres</button>
-        </div>
-      </div>
-
-      <!-- Right: quick actions -->
-      <div>
-        <h3 style="margin-bottom:14px;">Actions rapides</h3>
-        <div class="quick-actions">
-          <a href="analyse.html" class="quick-btn">
-            <span class="quick-btn-icon">📊</span>
-            <div>
-              <div class="quick-btn-text">Analyse Graphique</div>
-              <div class="quick-btn-sub">Uploadez un screenshot</div>
+        <!-- Formulaire -->
+        <div>
+          <div class="card">
+            <div class="panel-title">🌐 Analyser un actif</div>
+            <div class="form-group">
+              <label>Actif à analyser</label>
+              <input type="text" id="fundAsset" placeholder="BTC, EURUSD, Gold, SP500...">
             </div>
-          </a>
-          <a href="fondamental.html" class="quick-btn" id="fundLink">
-            <span class="quick-btn-icon">📰</span>
-            <div>
-              <div class="quick-btn-text">Analyse Fondamentale</div>
-              <div class="quick-btn-sub">Actualités du marché · Pro</div>
-            </div>
-          </a>
-          <div class="quick-btn" onclick="openUpgradeModal()" id="upgradeQuick" style="display:none;">
-            <span class="quick-btn-icon">⭐</span>
-            <div>
-              <div class="quick-btn-text">Upgrader mon plan</div>
-              <div class="quick-btn-sub">Prix de lancement disponibles</div>
+            <button class="btn btn-primary btn-full" onclick="analyzeFundamental()">Lancer l'analyse</button>
+            <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="resetFundamental()">Reset</button>
+            <div class="loader" id="fundLoader">Analyse de l'actualité en cours</div>
+
+            <hr class="divider">
+            <div style="font-size:0.8rem;color:var(--muted);">
+              <strong style="color:var(--muted2);">Actifs supportés :</strong><br>
+              Crypto : BTC, ETH, SOL, XRP<br>
+              Forex : EURUSD, GBPUSD, USDJPY<br>
+              Indices : SP500, NASDAQ<br>
+              Matières : GOLD, OIL
             </div>
           </div>
         </div>
+
+        <!-- Résultat -->
+        <div>
+          <div id="fundPlaceholder" class="card" style="text-align:center;padding:60px 24px;color:var(--muted);">
+            <div style="font-size:3rem;margin-bottom:16px;">📰</div>
+            <h3 style="color:var(--muted2);margin-bottom:8px;">En attente d'analyse</h3>
+            <p>Entrez un actif et lancez l'analyse pour voir le sentiment du marché.</p>
+          </div>
+          <div id="fundResult" class="hidden"></div>
+        </div>
+
       </div>
     </div>
 
@@ -170,92 +126,149 @@
 
 <!-- ── Upgrade Modal ── -->
 <div id="upgradeModal" class="modal-overlay">
-  <div class="modal-box" style="max-width:560px;">
-    <h2>Choisissez votre plan</h2>
+  <div class="modal-box" style="max-width:420px;text-align:center;">
+    <h2>Plan Pro requis</h2>
     <div style="background:#7c3aed15;border:1px solid #7c3aed33;border-radius:8px;padding:8px 14px;margin:12px 0;font-size:0.82em;color:#a78bfa;">
-      🎉 <strong>Prix de lancement</strong> — Offre limitée aux 50 premiers abonnés
+      🎉 <strong>Prix de lancement</strong> — 19€/mois au lieu de 39€
     </div>
-    <div class="plans-grid">
-      <div class="plan-card">
-        <div style="font-weight:700;margin-bottom:4px;">Premium</div>
-        <div class="plan-price-old">19€/mois</div>
-        <div class="price" style="font-family:'Syne',sans-serif;font-size:1.8em;font-weight:800;color:var(--accent);">9€<span style="font-size:0.5em;color:var(--muted2);">/mois</span></div>
-        <div class="plan-economy">Économisez 10€/mois</div>
-        <ul><li>50 analyses/mois</li><li>MytAI Fast, Pro, Vision</li></ul>
-        <button class="btn btn-outline btn-full" onclick="subscribe('premium')">Choisir Premium</button>
-      </div>
-      <div class="plan-card popular">
-        <div style="font-weight:700;margin-bottom:4px;color:#a78bfa;">⭐ Pro</div>
-        <div class="plan-price-old">39€/mois</div>
-        <div class="price" style="font-family:'Syne',sans-serif;font-size:1.8em;font-weight:800;color:#a78bfa;">19€<span style="font-size:0.5em;color:var(--muted2);">/mois</span></div>
-        <div class="plan-economy">Économisez 20€/mois</div>
-        <ul><li>Analyses illimitées</li><li>MytAI Fast, Pro, Vision, Expert</li><li>Analyse Fondamentale</li></ul>
-        <button class="btn btn-pro btn-full" onclick="subscribe('pro')">Choisir Pro</button>
-      </div>
+    <div class="plan-card popular" style="margin:16px 0;">
+      <div style="font-weight:700;margin-bottom:4px;color:#a78bfa;">⭐ Pro</div>
+      <div class="plan-price-old">39€/mois</div>
+      <div class="price" style="font-family:'Syne',sans-serif;font-size:2em;font-weight:800;color:#a78bfa;">19€<span style="font-size:0.45em;color:var(--muted2);">/mois</span></div>
+      <ul style="text-align:left;"><li>Analyses illimitées</li><li>MytAI Fast, Pro, Vision, Expert</li><li>Analyse Fondamentale ✓</li></ul>
+      <button class="btn btn-pro btn-full" onclick="subscribe('pro')">Choisir Pro</button>
     </div>
-    <p style="font-size:0.72em;color:var(--muted);text-align:center;margin-top:8px;">Sans engagement · Résiliable à tout moment</p>
+    <p style="font-size:0.72em;color:var(--muted);">Sans engagement · Résiliable à tout moment</p>
     <button class="btn btn-secondary btn-full mt-4" onclick="closeUpgradeModal()">Fermer</button>
+  </div>
+</div>
+
+<!-- ── Auth Modal ── -->
+<div id="authModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:420px;">
+    <h2>Connecte-toi pour continuer</h2>
+    <p style="margin-bottom:20px;font-size:0.88rem;">Crée un compte gratuit et reçois 2 analyses offertes.</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Se connecter</button>
+      <button class="auth-tab" id="authTabRegister" onclick="switchAuthTab('register')">S'inscrire</button>
+    </div>
+    <div class="form-group"><input type="email" id="authEmail" placeholder="Email"></div>
+    <div class="form-group"><input type="password" id="authPassword" placeholder="Mot de passe"></div>
+    <button class="btn btn-primary btn-full" id="authSubmitBtn" onclick="doAuth()">Se connecter</button>
+    <p id="authMsg" style="font-size:0.85rem;color:var(--danger);text-align:center;margin-top:10px;min-height:20px;"></p>
+    <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="closeAuthModal()">Fermer</button>
   </div>
 </div>
 
 <script src="auth.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  if (!requireAuth()) return;
   initNav();
   checkPaymentReturn();
-
   var user = getUser();
-  var plan = user.plan;
-  var q    = getQuota(user);
 
-  // Greeting
-  document.getElementById("dashTitle").textContent = "Bonjour, " + user.email.split("@")[0] + " 👋";
-
-  // Stats
-  document.getElementById("statUsed").textContent = q.used;
-  document.getElementById("statUsedSub").textContent = "depuis le début du mois";
-  document.getElementById("statLeft").textContent = plan === "pro" ? "∞" : q.left;
-  document.getElementById("statLeftSub").textContent = plan === "pro" ? "Illimité" : "restantes ce mois";
-  var planLabels = {free:"Gratuit", premium:"Premium", pro:"Pro"};
-  document.getElementById("statPlan").textContent = planLabels[plan] || "Free";
-  document.getElementById("statPlanSub").textContent = plan === "free" ? "2 analyses à vie" : plan === "premium" ? "50 analyses/mois" : "Analyses illimitées";
-
-  // Quota bar
-  var pct = plan === "pro" ? 30 : Math.min(100, (q.used / q.limit) * 100);
-  document.getElementById("quotaLabelDash").textContent = plan === "pro" ? q.used + " analyses" : q.used + "/" + q.limit + " analyses";
-  document.getElementById("quotaFillDash").style.width = pct + "%";
-  document.getElementById("quotaFillDash").style.background = pct >= 90 ? "var(--danger)" : pct >= 60 ? "var(--warning)" : "var(--accent)";
-  document.getElementById("quotaMaxDash").textContent = planLabels[plan];
-
-  // Plan features
-  var featuresByPlan = {
-    free:    ["2 analyses à vie", "MytAI Fast"],
-    premium: ["50 analyses/mois", "MytAI Fast", "MytAI Pro", "MytAI Vision", "Renouvellement mensuel"],
-    pro:     ["Analyses illimitées", "MytAI Fast, Pro, Vision, Expert", "Analyse Fondamentale", "Accès prioritaire aux nouveautés"]
-  };
-  var features = featuresByPlan[plan] || featuresByPlan.free;
-  var ul = document.getElementById("planFeatures");
-  features.forEach(function(f) {
-    var li = document.createElement("li");
-    li.textContent = f;
-    ul.appendChild(li);
-  });
-
-  // Actions
-  var actions = document.getElementById("planActions");
-  if (plan === "free" || plan === "premium") {
-    document.getElementById("upgradeBanner").style.display = "flex";
-    document.getElementById("upgradeQuick").style.display = "flex";
+  if (!user) {
+    // Pas connecté → montre le lock + bouton connexion dans la nav
+    document.getElementById("proLockBanner").classList.remove("hidden");
+    return;
   }
-  if (plan === "premium" || plan === "pro") {
-    var cancelBtn = document.createElement("button");
-    cancelBtn.className = "btn btn-danger btn-sm";
-    cancelBtn.textContent = "Résilier l'abonnement";
-    cancelBtn.onclick = cancelSubscription;
-    actions.appendChild(cancelBtn);
+
+  if (user.plan !== "pro") {
+    document.getElementById("proLockBanner").classList.remove("hidden");
+  } else {
+    document.getElementById("fondContent").classList.remove("hidden");
   }
 });
+
+async function analyzeFundamental() {
+  var user = getUser();
+  if (!user) { openAuthModal(); return; }
+  if (user.plan !== "pro") { openUpgradeModal(); return; }
+
+  var asset = document.getElementById("fundAsset").value.trim();
+  if (!asset) { alert("Saisis un actif (ex: BTC, EURUSD, Gold)"); return; }
+
+  var loader = document.getElementById("fundLoader");
+  loader.style.display = "block";
+  document.getElementById("fundResult").classList.add("hidden");
+  document.getElementById("fundPlaceholder").classList.remove("hidden");
+
+  try {
+    var res  = await fetch(API + "/fundamental", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({email: user.email, password: user.password, asset})
+    });
+    var data = await res.json();
+    if (data.error === "PRO_ONLY") { openUpgradeModal(); return; }
+    if (data.error) { alert("Erreur : " + data.error); return; }
+    renderFundamental(data);
+  } catch(e) {
+    alert("Erreur réseau : " + e.message);
+  } finally {
+    loader.style.display = "none";
+  }
+}
+
+function resetFundamental() {
+  document.getElementById("fundAsset").value = "";
+  document.getElementById("fundResult").innerHTML = "";
+  document.getElementById("fundResult").classList.add("hidden");
+  document.getElementById("fundPlaceholder").classList.remove("hidden");
+}
+
+function renderFundamental(data) {
+  var placeholder = document.getElementById("fundPlaceholder");
+  var result      = document.getElementById("fundResult");
+  placeholder.classList.add("hidden");
+  result.classList.remove("hidden");
+
+  var color = data.sentiment_couleur || "var(--warning)";
+
+  var newsHtml = "";
+  if (Array.isArray(data.news_cles)) {
+    data.news_cles.forEach(function(n) {
+      var ic = n.impact === "POSITIF" ? "impact-pos" : n.impact === "NEGATIF" ? "impact-neg" : "impact-neu";
+      newsHtml += '<div class="news-item">'
+        + '<span class="news-impact ' + ic + '">' + n.impact + '</span>'
+        + '<div style="font-size:0.9em;font-weight:600;margin:3px 0;">' + n.titre + '</div>'
+        + '<div style="font-size:0.82em;color:var(--muted2);">' + n.explication + '</div>'
+        + '</div>';
+    });
+  }
+
+  var facteursHtml = "";
+  if (Array.isArray(data.facteurs_surveillance)) {
+    data.facteurs_surveillance.forEach(function(f) {
+      facteursHtml += '<div class="facteur-item">' + f + '</div>';
+    });
+  }
+
+  result.innerHTML = '<div class="result-box">'
+    + '<div style="margin-bottom:16px;">'
+    + '<div class="result-label" style="margin-bottom:8px;">Sentiment — ' + data.actif + '</div>'
+    + '<div class="sentiment-badge" style="background:' + color + '22;border:1px solid ' + color + '44;">'
+    + '<span style="width:12px;height:12px;border-radius:50%;background:' + color + ';display:inline-block;"></span>'
+    + '<span style="color:' + color + '">' + data.sentiment + '</span>'
+    + (data.confiance ? '<span style="color:var(--muted2);font-size:0.82em;">— ' + data.confiance + '% de confiance</span>' : '')
+    + '</div>'
+    + '</div>'
+
+    + '<div class="result-section"><div class="result-label">Résumé</div>' + (data.resume||"") + '</div>'
+
+    + '<div style="margin:14px 0;">'
+    + '<div class="result-label" style="border-left:3px solid var(--accent);padding-left:10px;margin-bottom:8px;">News clés du jour</div>'
+    + newsHtml
+    + '</div>'
+
+    + (facteursHtml ? '<div class="result-section"><div class="result-label">À surveiller</div>' + facteursHtml + '</div>' : '')
+
+    + '<hr class="divider">'
+    + '<div class="result-section"><div class="result-label">Conclusion</div>' + (data.conclusion||"") + '</div>'
+
+    + (data.nb_news ? '<div style="font-size:0.72em;color:var(--muted);text-align:right;margin-top:8px;">' + data.nb_news + ' articles analysés</div>' : '')
+    + '</div>';
+}
 </script>
 </body>
 </html>
