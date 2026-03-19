@@ -2,7 +2,6 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<style>html{background:#080c14}</style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Historique des Analyses — MyTradingX</title>
 <meta name="description" content="Consultez l'historique de vos analyses SMC et suivez vos performances de trading.">
@@ -253,6 +252,17 @@ var MODEL_LABELS = {
   "claude":      "MytAI Expert"
 };
 
+// Calcule le bon password pour les users Google
+async function getAuthPassword(user) {
+  if (user.password !== "GOOGLE_AUTH") return user.password;
+  var encoder = new TextEncoder();
+  var data = encoder.encode(user.email);
+  var hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  var hashArray  = Array.from(new Uint8Array(hashBuffer));
+  var emailHash  = hashArray.map(function(b){ return b.toString(16).padStart(2,"0"); }).join("").slice(0,16);
+  return "GOOGLE_OAUTH_" + emailHash;
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   if (!requireAuth()) return;
   initNav();
@@ -268,7 +278,7 @@ async function loadHistory() {
     var res  = await fetch(API + "/get-history", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({email: user.email, password: user.password})
+      body: JSON.stringify({email: user.email, password: await getAuthPassword(user)})
     });
     var data = await res.json();
     if (data.error) { alert("Erreur : " + data.error); return; }
@@ -502,7 +512,7 @@ async function doSaveResult(id, result, note) {
     await fetch(API + "/update-trade-result", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({email: user.email, password: user.password, id: id, trade_result: result, trade_note: note || ""})
+      body: JSON.stringify({email: user.email, password: await getAuthPassword(user), id: id, trade_result: result, trade_note: note || ""})
     });
   } catch(e) { /* silencieux */ }
 }
