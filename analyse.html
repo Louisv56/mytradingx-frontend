@@ -35,6 +35,14 @@
 .btn-multitf.active { border-color: var(--accent); color: var(--accent); background: #38bdf810; }
 .multitf-zone { display: none; }
 .multitf-zone.open { display: block; }
+.btn-result {
+  padding: 8px 16px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg2);
+  color: var(--muted2); font-family: 'DM Sans', sans-serif;
+  font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+}
+.btn-result:hover { border-color: var(--accent); color: var(--text); }
+.btn-result.active-result { border-color: var(--accent); background: #38bdf815; color: var(--accent); }
 .panel-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .news-item { background: var(--bg2); border-radius: var(--radius); padding: 10px 12px; margin: 6px 0; }
 .news-impact { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72em; font-weight: 700; margin-bottom: 4px; }
@@ -370,19 +378,32 @@ async function analyze() {
   }
 }
 
+// Retourne le bon password à envoyer au backend (supporte Google Auth)
+async function getAuthPassword(user) {
+  if (user.password !== "GOOGLE_AUTH") return user.password;
+  // Recalculer le hash Google côté frontend via SHA-256
+  var encoder = new TextEncoder();
+  var data = encoder.encode(user.email);
+  var hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  var hashArray  = Array.from(new Uint8Array(hashBuffer));
+  var emailHash  = hashArray.map(function(b){ return b.toString(16).padStart(2,"0"); }).join("").slice(0,16);
+  return "GOOGLE_OAUTH_" + emailHash;
+}
+
 // Retourne l'ID Supabase de l'analyse sauvegardée
 async function saveAnalysis(data, asset, timeframe) {
   var user = getUser();
   if (!user) return null;
   try {
-    var entrees     = Array.isArray(data.entrees)      ? data.entrees.join(" / ")      : (data.entrees || "");
-    var take_profit = Array.isArray(data.take_profit)  ? data.take_profit.join(" / ")  : (data.take_profit || "");
+    var pwd         = await getAuthPassword(user);
+    var entrees     = Array.isArray(data.entrees)     ? data.entrees.join(" / ")     : (data.entrees || "");
+    var take_profit = Array.isArray(data.take_profit) ? data.take_profit.join(" / ") : (data.take_profit || "");
     var res = await fetch(API + "/save-analysis", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
         email:       user.email,
-        password:    user.password,
+        password:    pwd,
         asset:       asset || "",
         timeframe:   timeframe || "",
         modele:      data.modele || "",
@@ -395,8 +416,9 @@ async function saveAnalysis(data, asset, timeframe) {
       })
     });
     var saved = await res.json();
+    if (saved.error) { console.error("save-analysis:", saved.error); return null; }
     return saved.id || null;
-  } catch(e) { return null; }
+  } catch(e) { console.error("saveAnalysis:", e); return null; }
 }
 
 var _currentAnalyseId = null;
@@ -475,6 +497,7 @@ async function saveTradeResult() {
     if (msg) msg.textContent = "Erreur : analyse non trouvée.";
     return;
   }
+  var pwd  = await getAuthPassword(user);
   var note = document.getElementById("tradeNoteInput").value;
   try {
     await fetch(API + "/update-trade-result", {
@@ -482,7 +505,7 @@ async function saveTradeResult() {
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({
         email:        user.email,
-        password:     user.password,
+        password:     pwd,
         id:           _currentAnalyseId,
         trade_result: _pendingTradeResult,
         trade_note:   note
