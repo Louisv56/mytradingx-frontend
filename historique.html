@@ -1,133 +1,138 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Historique des Analyses — MyTradingX</title>
-<meta name="description" content="Consultez l'historique de vos analyses SMC et suivez vos performances de trading.">
-<meta name="robots" content="noindex">
-<link rel="icon" type="image/png" href="faviconmtx.png">
-<link rel="stylesheet" href="style.css">
-<style>
-.historique-page { padding: 88px 0 60px; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historique des Analyses — MyTradingX</title>
+  <meta name="description" content="Consultez l'historique de vos analyses SMC et suivez vos performances de trading.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="faviconmtx.png">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .historique-page { padding: 88px 0 60px; }
 
-/* ── Stats cards ── */
-.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
-.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; }
-.stat-card-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-.stat-card-value { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: white; }
-.stat-card-sub   { font-size: 0.78rem; color: var(--muted2); margin-top: 4px; }
+    /* ── Stats cards ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; }
+    .stat-card-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .stat-card-value { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: white; }
+    .stat-card-sub   { font-size: 0.78rem; color: var(--muted2); margin-top: 4px; }
 
-/* ── Filtres ── */
-.filters-bar {
-  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
-  margin-bottom: 20px;
-}
-.filter-btn {
-  padding: 6px 14px; border-radius: 20px;
-  border: 1px solid var(--border); background: var(--bg2);
-  color: var(--muted2); font-size: 0.82rem; font-weight: 600;
-  cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-}
-.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
-.filter-btn.active { border-color: var(--accent); background: #38bdf815; color: var(--accent); }
-.filter-select {
-  padding: 6px 12px; border-radius: 20px;
-  border: 1px solid var(--border); background: var(--bg2);
-  color: var(--muted2); font-size: 0.82rem;
-  cursor: pointer; font-family: 'DM Sans', sans-serif;
-  width: auto;
-}
+    /* ── Filtres ── */
+    .filters-bar {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 20px;
+    }
+    .filter-btn {
+      padding: 6px 14px; border-radius: 20px;
+      border: 1px solid var(--border); background: var(--bg2);
+      color: var(--muted2); font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    }
+    .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-btn.active { border-color: var(--accent); background: #38bdf815; color: var(--accent); }
+    .filter-select {
+      padding: 6px 12px; border-radius: 20px;
+      border: 1px solid var(--border); background: var(--bg2);
+      color: var(--muted2); font-size: 0.82rem;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      width: auto;
+    }
 
-/* ── Cards analyses ── */
-.analyses-list { display: flex; flex-direction: column; gap: 14px; }
-.analyse-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 20px;
-  transition: border-color 0.2s;
-}
-.analyse-card:hover { border-color: var(--border2); }
-.analyse-card.result-win  { border-left: 3px solid var(--accent3); }
-.analyse-card.result-loss { border-left: 3px solid var(--danger); }
-.analyse-card.result-skip { border-left: 3px solid var(--muted); }
+    /* ── Cards analyses ── */
+    .analyses-list { display: flex; flex-direction: column; gap: 14px; }
+    .analyse-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 20px;
+      transition: border-color 0.2s;
+    }
+    .analyse-card:hover { border-color: var(--border2); }
+    .analyse-card.result-win  { border-left: 4px solid var(--accent3); }
+    .analyse-card.result-loss { border-left: 4px solid var(--danger); }
+    .analyse-card.result-skip { border-left: 4px solid var(--muted); }
 
-.card-top {
-  display: flex; align-items: flex-start;
-  justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-.card-asset { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: white; }
-.card-meta  { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.78rem; color: var(--muted2); align-items: center; }
-.card-meta span { display: flex; align-items: center; gap: 4px; }
+    .card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .card-asset { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: white; }
+    .card-meta  { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.78rem; color: var(--muted2); align-items: center; }
+    .card-meta span { display: flex; align-items: center; gap: 4px; }
 
-.card-data {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
-  background: var(--bg2); border-radius: var(--radius);
-  padding: 14px; margin-bottom: 14px;
-}
-.data-item-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-.data-item-value { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+    .card-data {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      background: var(--bg2); border-radius: var(--radius);
+      padding: 14px; margin-bottom: 14px;
+    }
+    .data-item-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .data-item-value { font-size: 0.88rem; font-weight: 600; color: var(--text); }
 
-.card-explication {
-  font-size: 0.83rem; color: var(--muted2); line-height: 1.6;
-  max-height: 60px; overflow: hidden; position: relative;
-  transition: max-height 0.3s;
-}
-.card-explication.expanded { max-height: 500px; }
-.btn-toggle-expl {
-  background: none; border: none; color: var(--accent);
-  font-size: 0.78rem; cursor: pointer; padding: 4px 0;
-  font-family: 'DM Sans', sans-serif;
-}
+    .card-explication {
+      font-size: 0.83rem; color: var(--muted2); line-height: 1.6;
+      max-height: 60px; overflow: hidden; position: relative;
+      transition: max-height 0.3s;
+    }
+    .card-explication.expanded { max-height: 500px; }
+    .btn-toggle-expl {
+      background: none; border: none; color: var(--accent);
+      font-size: 0.78rem; cursor: pointer; padding: 4px 0;
+      font-family: 'DM Sans', sans-serif;
+    }
 
-.card-bottom {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 10px; margin-top: 14px;
-  padding-top: 14px; border-top: 1px solid var(--border);
-}
-.result-btns { display: flex; gap: 6px; }
-.result-btn {
-  padding: 6px 12px; border-radius: var(--radius);
-  border: 1px solid var(--border); background: var(--bg2);
-  color: var(--muted2); font-size: 0.8rem; font-weight: 600;
-  cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-}
-.result-btn:hover { border-color: var(--border2); color: var(--text); }
-.result-btn.active-win  { border-color: var(--accent3); background: #22c55e15; color: var(--accent3); }
-.result-btn.active-loss { border-color: var(--danger);  background: #ef444415; color: var(--danger); }
-.result-btn.active-skip { border-color: var(--muted);   background: #64748b15; color: var(--muted2); }
+    .card-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px; margin-top: 14px;
+      padding-top: 14px; border-top: 1px solid var(--border);
+    }
+    .result-btns { display: flex; gap: 6px; }
+    .result-btn {
+      padding: 6px 12px; border-radius: var(--radius);
+      border: 1px solid var(--border); background: var(--bg2);
+      color: var(--muted2); font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    }
+    .result-btn:hover { border-color: var(--border2); color: var(--text); }
+    .result-btn.active-win  { border-color: var(--accent3); background: #22c55e15; color: var(--accent3); }
+    .result-btn.active-loss { border-color: var(--danger);  background: #ef444415; color: var(--danger); }
+    .result-btn.active-skip { border-color: var(--muted);   background: #64748b15; color: var(--muted2); }
 
-.note-zone { display: flex; gap: 8px; align-items: center; width: 100%; margin-top: 8px; }
-.note-zone input { font-size: 0.82rem; padding: 7px 12px; }
-.note-zone button { white-space: nowrap; }
-.card-note {
-  font-size: 0.8rem; color: var(--muted2);
-  font-style: italic; padding: 4px 0;
-}
+    .note-zone { display: flex; gap: 8px; align-items: center; width: 100%; margin-top: 12px; }
+    .note-zone input { 
+      flex: 1; font-size: 0.82rem; padding: 8px 12px; 
+      background: var(--bg); border: 1px solid var(--border); 
+      border-radius: var(--radius); color: white;
+    }
+    .card-note {
+      font-size: 0.82rem; color: #a78bfa;
+      font-style: italic; padding: 8px 12px;
+      background: #a78bfa08; border-radius: var(--radius);
+      margin-top: 8px; border: 1px dashed #a78bfa40;
+    }
 
-/* ── Empty / loader ── */
-.empty-state {
-  text-align: center; padding: 60px 24px;
-  color: var(--muted); background: var(--card);
-  border: 1px solid var(--border); border-radius: var(--radius-lg);
-}
-.empty-state h3 { color: var(--muted2); margin-bottom: 8px; }
-.page-loader { text-align: center; padding: 60px; color: var(--muted2); }
+    /* ── Empty / loader ── */
+    .empty-state {
+      text-align: center; padding: 60px 24px;
+      color: var(--muted); background: var(--card);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+    }
+    .empty-state h3 { color: var(--muted2); margin-bottom: 8px; }
+    .page-loader { text-align: center; padding: 60px; color: var(--muted2); }
 
-/* ── Winrate bar ── */
-.winrate-bar-wrap { margin: 6px 0 0; }
-.winrate-bar-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-.winrate-bar-fill  { height: 100%; background: var(--accent3); border-radius: 3px; transition: width 0.5s; }
+    /* ── Winrate bar ── */
+    .winrate-bar-wrap { margin: 6px 0 0; }
+    .winrate-bar-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .winrate-bar-fill  { height: 100%; background: var(--accent3); border-radius: 3px; transition: width 0.5s; }
 
-@media (max-width: 768px) {
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .card-data  { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 480px) {
-  .stats-row { grid-template-columns: 1fr 1fr; }
-  .card-data  { grid-template-columns: 1fr 1fr; }
-}
-</style>
+    @media (max-width: 768px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .card-data  { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .card-data  { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
 </head>
 <body>
 
@@ -159,7 +164,6 @@
       <a href="analyse.html" class="btn btn-primary">+ Nouvelle analyse</a>
     </div>
 
-    <!-- Stats -->
     <div class="stats-row" id="statsRow">
       <div class="stat-card">
         <div class="stat-card-label">Total analyses</div>
@@ -185,7 +189,6 @@
       </div>
     </div>
 
-    <!-- Filtres -->
     <div class="filters-bar">
       <button class="filter-btn active" onclick="setFilter('all', this)">Toutes</button>
       <button class="filter-btn" onclick="setFilter('win', this)">✅ Gagnées</button>
@@ -203,7 +206,6 @@
       </select>
     </div>
 
-    <!-- Liste analyses -->
     <div id="pageLoader" class="page-loader">Chargement de l'historique…</div>
     <div id="analysesList" class="analyses-list" style="display:none;"></div>
     <div id="emptyState" class="empty-state hidden">
@@ -216,32 +218,15 @@
   </div>
 </div>
 
-<!-- Upgrade Modal -->
-<div id="upgradeModal" class="modal-overlay">
-  <div class="modal-box" style="max-width:560px;">
-    <h2>Passez à la version supérieure</h2>
-    <div class="plans-grid">
-      <div class="plan-card">
-        <div style="font-weight:700;margin-bottom:4px;">Premium</div>
-        <div class="plan-price-old">19€/mois</div>
-        <div class="price" style="font-family:'Syne',sans-serif;font-size:1.8em;font-weight:800;color:var(--accent);">9€<span style="font-size:0.5em;color:var(--muted2);">/mois</span></div>
-        <ul><li>50 analyses/mois</li><li>MytAI Fast, Pro, Vision</li></ul>
-        <button class="btn btn-outline btn-full" onclick="subscribe('premium')">Choisir Premium</button>
-      </div>
-      <div class="plan-card popular">
-        <div style="font-weight:700;margin-bottom:4px;color:#a78bfa;">⭐ Pro</div>
-        <div class="plan-price-old">39€/mois</div>
-        <div class="price" style="font-family:'Syne',sans-serif;font-size:1.8em;font-weight:800;color:#a78bfa;">19€<span style="font-size:0.5em;color:var(--muted2);">/mois</span></div>
-        <ul><li>Analyses illimitées</li><li>Tous les moteurs MytAI</li><li>Analyse Fondamentale</li></ul>
-        <button class="btn btn-pro btn-full" onclick="subscribe('pro')">Choisir Pro</button>
-      </div>
-    </div>
-    <button class="btn btn-secondary btn-full mt-4" onclick="closeUpgradeModal()">Fermer</button>
-  </div>
-</div>
-
 <script src="auth.js"></script>
 <script>
+// Assurez-vous que l'API est définie si auth.js ne le fait pas
+if (typeof API === 'undefined') {
+  var API = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
+            ? "http://127.0.0.1:5000" 
+            : "https://trading-ai-7y8g.onrender.com"; // Remplacer par votre URL réelle si nécessaire
+}
+
 var _allAnalyses  = [];
 var _activeFilter = "all";
 
@@ -252,14 +237,21 @@ var MODEL_LABELS = {
   "claude":      "MytAI Expert"
 };
 
-// Calcule le bon password pour les users Google
+/**
+ * Génère le mot de passe pour les utilisateurs Google
+ * Doit correspondre exactement à la logique hash_password(GOOGLE_OAUTH_ + email_hash[:16]) du backend
+ */
 async function getAuthPassword(user) {
-  if (user.password !== "GOOGLE_AUTH") return user.password;
+  if (user.password && user.password !== "GOOGLE_AUTH") return user.password;
+  
+  // Hash l'email pour obtenir le suffixe
   var encoder = new TextEncoder();
   var data = encoder.encode(user.email);
   var hashBuffer = await crypto.subtle.digest("SHA-256", data);
   var hashArray  = Array.from(new Uint8Array(hashBuffer));
-  var emailHash  = hashArray.map(function(b){ return b.toString(16).padStart(2,"0"); }).join("").slice(0,16);
+  var emailHash  = hashArray.map(b => b.toString(16).padStart(2,"0")).join("").slice(0,16);
+  
+  // Retourne le flag que le backend saura interpréter (qui contient le hash de l'email)
   return "GOOGLE_OAUTH_" + emailHash;
 }
 
@@ -275,19 +267,22 @@ async function loadHistory() {
   document.getElementById("analysesList").style.display = "none";
 
   try {
+    var pass = await getAuthPassword(user);
     var res  = await fetch(API + "/get-history", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({email: user.email, password: await getAuthPassword(user)})
+      body: JSON.stringify({email: user.email, password: pass})
     });
     var data = await res.json();
-    if (data.error) { alert("Erreur : " + data.error); return; }
+    if (data.error) { throw new Error(data.error); }
+    
     _allAnalyses = data.analyses || [];
     computeStats(_allAnalyses);
     buildAssetFilter(_allAnalyses);
     applyFilters();
   } catch(e) {
-    alert("Erreur réseau : " + e.message);
+    console.error("Erreur historique:", e);
+    alert("Erreur lors de la récupération : " + e.message);
   } finally {
     document.getElementById("pageLoader").style.display = "none";
   }
@@ -295,49 +290,50 @@ async function loadHistory() {
 
 function computeStats(analyses) {
   var total  = analyses.length;
-  var wins   = analyses.filter(function(a){ return a.trade_result === "win"; }).length;
-  var losses = analyses.filter(function(a){ return a.trade_result === "loss"; }).length;
+  var wins   = analyses.filter(a => a.trade_result === "win").length;
+  var losses = analyses.filter(a => a.trade_result === "loss").length;
   var rated  = wins + losses;
   var winrate = rated > 0 ? Math.round((wins / rated) * 100) : null;
 
   document.getElementById("statTotal").textContent = total;
   document.getElementById("statWinrate").textContent = winrate !== null ? winrate + "%" : "—";
-  document.getElementById("winrateBar").style.width = (winrate || 0) + "%";
-  document.getElementById("winrateBar").style.background = winrate >= 60 ? "var(--accent3)" : winrate >= 40 ? "var(--warning)" : "var(--danger)";
+  
+  var bar = document.getElementById("winrateBar");
+  bar.style.width = (winrate || 0) + "%";
+  bar.style.background = winrate >= 60 ? "#22c55e" : winrate >= 40 ? "#f97316" : "#ef4444";
 
-  // Meilleur modèle (par winrate sur les trades évalués)
+  // Meilleur modèle
   var modelStats = {};
-  analyses.forEach(function(a) {
+  analyses.forEach(a => {
     if (!a.modele) return;
     if (!modelStats[a.modele]) modelStats[a.modele] = {win:0, total:0};
-    if (a.trade_result === "win")  { modelStats[a.modele].win++; modelStats[a.modele].total++; }
-    if (a.trade_result === "loss") { modelStats[a.modele].total++; }
+    if (a.trade_result === "win") { modelStats[a.modele].win++; modelStats[a.modele].total++; }
+    else if (a.trade_result === "loss") { modelStats[a.modele].total++; }
   });
+  
   var bestModel = null, bestRate = -1;
-  Object.keys(modelStats).forEach(function(m) {
-    var s = modelStats[m];
-    if (s.total > 0) {
-      var r = s.win / s.total;
+  Object.keys(modelStats).forEach(m => {
+    if (modelStats[m].total >= 2) { // Minimum 2 trades évalués
+      var r = modelStats[m].win / modelStats[m].total;
       if (r > bestRate) { bestRate = r; bestModel = m; }
     }
   });
   document.getElementById("statBestModel").textContent = bestModel ? (MODEL_LABELS[bestModel] || bestModel) : "—";
-  document.getElementById("statBestModelSub").textContent = bestModel ? (Math.round(bestRate*100) + "% de réussite") : "Pas encore de données";
+  document.getElementById("statBestModelSub").textContent = bestModel ? (Math.round(bestRate*100) + "% de réussite") : "Données insuffisantes";
 
   // Actif favori
   var assetCount = {};
-  analyses.forEach(function(a) {
-    if (a.asset) assetCount[a.asset] = (assetCount[a.asset] || 0) + 1;
-  });
-  var bestAsset = Object.keys(assetCount).sort(function(a,b){ return assetCount[b]-assetCount[a]; })[0];
+  analyses.forEach(a => { if (a.asset) assetCount[a.asset] = (assetCount[a.asset] || 0) + 1; });
+  var bestAsset = Object.keys(assetCount).sort((a,b) => assetCount[b] - assetCount[a])[0];
   document.getElementById("statBestAsset").textContent = bestAsset || "—";
   document.getElementById("statBestAssetSub").textContent = bestAsset ? assetCount[bestAsset] + " analyses" : "";
 }
 
 function buildAssetFilter(analyses) {
-  var assets = [...new Set(analyses.map(function(a){ return a.asset; }).filter(Boolean))].sort();
+  var assets = [...new Set(analyses.map(a => a.asset).filter(Boolean))].sort();
   var sel = document.getElementById("filterAsset");
-  assets.forEach(function(a) {
+  sel.innerHTML = '<option value="">Tous les actifs</option>';
+  assets.forEach(a => {
     var opt = document.createElement("option");
     opt.value = a; opt.textContent = a;
     sel.appendChild(opt);
@@ -346,7 +342,7 @@ function buildAssetFilter(analyses) {
 
 function setFilter(filter, btn) {
   _activeFilter = filter;
-  document.querySelectorAll(".filter-btn").forEach(function(b){ b.classList.remove("active"); });
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
   if (btn) btn.classList.add("active");
   applyFilters();
 }
@@ -355,7 +351,7 @@ function applyFilters() {
   var assetFilter     = document.getElementById("filterAsset").value;
   var directionFilter = document.getElementById("filterDirection").value;
 
-  var filtered = _allAnalyses.filter(function(a) {
+  var filtered = _allAnalyses.filter(a => {
     if (_activeFilter === "win"     && a.trade_result !== "win")  return false;
     if (_activeFilter === "loss"    && a.trade_result !== "loss") return false;
     if (_activeFilter === "skip"    && a.trade_result !== "skip") return false;
@@ -377,144 +373,147 @@ function renderList(analyses) {
     empty.classList.remove("hidden");
     return;
   }
+  
   empty.classList.add("hidden");
   list.style.display = "flex";
 
-  list.innerHTML = analyses.map(function(a) {
+  list.innerHTML = analyses.map(a => {
     var dirClass  = a.direction === "BUY" ? "badge-buy" : a.direction === "SELL" ? "badge-sell" : "badge-neutre";
     var cardClass = a.trade_result === "win" ? "result-win" : a.trade_result === "loss" ? "result-loss" : a.trade_result === "skip" ? "result-skip" : "";
-    var dateStr   = a.created_at ? new Date(a.created_at).toLocaleDateString("fr-FR", {day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"}) : "";
+    var dateStr   = a.created_at ? new Date(a.created_at).toLocaleDateString("fr-FR", {day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"}) : "Date inconnue";
     var modelLabel = MODEL_LABELS[a.modele] || a.modele || "—";
-
-    var probaColor = a.probabilite >= 70 ? "var(--accent3)" : a.probabilite >= 50 ? "var(--warning)" : "var(--danger)";
+    var probaColor = a.probabilite >= 70 ? "#22c55e" : a.probabilite >= 50 ? "#f97316" : "#ef4444";
 
     var resultBadge = "";
-    if      (a.trade_result === "win")  resultBadge = '<span style="color:var(--accent3);font-size:0.82rem;font-weight:600;">✅ Gagné</span>';
-    else if (a.trade_result === "loss") resultBadge = '<span style="color:var(--danger);font-size:0.82rem;font-weight:600;">❌ Perdu</span>';
+    if      (a.trade_result === "win")  resultBadge = '<span style="color:#22c55e;font-size:0.82rem;font-weight:600;">✅ Gagné</span>';
+    else if (a.trade_result === "loss") resultBadge = '<span style="color:#ef4444;font-size:0.82rem;font-weight:600;">❌ Perdu</span>';
     else if (a.trade_result === "skip") resultBadge = '<span style="color:var(--muted2);font-size:0.82rem;font-weight:600;">⏭ Non pris</span>';
     else resultBadge = '<span style="color:var(--muted);font-size:0.82rem;">⏳ En attente</span>';
 
-    return '<div class="analyse-card ' + cardClass + '" id="card-' + a.id + '">'
+    return `
+      <div class="analyse-card ${cardClass}" id="card-${a.id}">
+        <div class="card-top">
+          <div>
+            <div class="card-asset">${a.asset || "Actif inconnu"} <span style="font-size:0.75rem;color:var(--muted2);font-weight:400;">· ${a.timeframe || ""}</span></div>
+            <div class="card-meta" style="margin-top:4px;">
+              <span>📅 ${dateStr}</span>
+              <span>🤖 ${modelLabel}</span>
+              ${resultBadge}
+            </div>
+          </div>
+          <span class="badge ${dirClass}" style="font-size:0.9em;padding:5px 14px;">${a.direction || "—"}</span>
+        </div>
 
-      // Top
-      + '<div class="card-top">'
-      + '<div>'
-      + '<div class="card-asset">' + (a.asset || "Actif inconnu") + (a.timeframe ? ' <span style="font-size:0.75rem;color:var(--muted2);font-weight:400;">· ' + a.timeframe + '</span>' : '') + '</div>'
-      + '<div class="card-meta" style="margin-top:4px;">'
-      + '<span>📅 ' + dateStr + '</span>'
-      + '<span>🤖 ' + modelLabel + '</span>'
-      + resultBadge
-      + '</div>'
-      + '</div>'
-      + '<span class="badge ' + dirClass + '" style="font-size:0.9em;padding:5px 14px;">' + (a.direction||"—") + '</span>'
-      + '</div>'
+        <div class="card-data">
+          <div><div class="data-item-label">Entrées</div><div class="data-item-value">${a.entrees || "—"}</div></div>
+          <div><div class="data-item-label">Stop Loss</div><div class="data-item-value" style="color:#ef4444;">${a.stop_loss || "—"}</div></div>
+          <div><div class="data-item-label">Take Profit</div><div class="data-item-value" style="color:#22c55e;">${a.take_profit || "—"}</div></div>
+          <div><div class="data-item-label">Probabilité</div><div class="data-item-value" style="color:${probaColor};">${a.probabilite ? a.probabilite + "%" : "—"}</div></div>
+        </div>
 
-      // Data grid
-      + '<div class="card-data">'
-      + '<div><div class="data-item-label">Entrées</div><div class="data-item-value">' + (a.entrees||"—") + '</div></div>'
-      + '<div><div class="data-item-label">Stop Loss</div><div class="data-item-value" style="color:var(--danger);">' + (a.stop_loss||"—") + '</div></div>'
-      + '<div><div class="data-item-label">Take Profit</div><div class="data-item-value" style="color:var(--accent3);">' + (a.take_profit||"—") + '</div></div>'
-      + '<div><div class="data-item-label">Probabilité</div><div class="data-item-value" style="color:' + probaColor + ';">' + (a.probabilite ? a.probabilite + "%" : "—") + '</div></div>'
-      + '</div>'
+        ${a.explication ? `
+          <div class="card-explication" id="expl-${a.id}">${a.explication}</div>
+          <button class="btn-toggle-expl" onclick="toggleExpl('${a.id}')">Voir plus ▾</button>
+        ` : ''}
 
-      // Explication
-      + (a.explication ? '<div class="card-explication" id="expl-' + a.id + '">' + a.explication + '</div>'
-        + '<button class="btn-toggle-expl" onclick="toggleExpl(\'' + a.id + '\')">Voir plus ▾</button>' : '')
+        <div id="note-display-${a.id}">
+          ${a.trade_note ? `<div class="card-note">📝 ${a.trade_note}</div>` : ''}
+        </div>
 
-      // Note existante
-      + (a.trade_note ? '<div class="card-note">📝 ' + a.trade_note + '</div>' : '')
+        <div class="card-bottom">
+          <div style="font-size:0.8rem;color:var(--muted);">Résultat du trade :</div>
+          <div class="result-btns">
+            <button class="result-btn ${a.trade_result==='win'?'active-win':''}" onclick="quickResult('${a.id}','win',this)">✅ Gagné</button>
+            <button class="result-btn ${a.trade_result==='loss'?'active-loss':''}" onclick="quickResult('${a.id}','loss',this)">❌ Perdu</button>
+            <button class="result-btn ${a.trade_result==='skip'?'active-skip':''}" onclick="quickResult('${a.id}','skip',this)">⏭ Non pris</button>
+          </div>
+        </div>
 
-      // Bottom — feedback
-      + '<div class="card-bottom">'
-      + '<div style="font-size:0.8rem;color:var(--muted);">Ce trade s\'est-il bien passé ?</div>'
-      + '<div class="result-btns">'
-      + '<button class="result-btn ' + (a.trade_result==="win"?"active-win":"") + '" onclick="quickResult(\'' + a.id + '\',\'win\',this)">✅ Gagné</button>'
-      + '<button class="result-btn ' + (a.trade_result==="loss"?"active-loss":"") + '" onclick="quickResult(\'' + a.id + '\',\'loss\',this)">❌ Perdu</button>'
-      + '<button class="result-btn ' + (a.trade_result==="skip"?"active-skip":"") + '" onclick="quickResult(\'' + a.id + '\',\'skip\',this)">⏭ Non pris</button>'
-      + '</div>'
-      + '</div>'
-
-      // Zone note inline
-      + '<div class="note-zone hidden" id="note-' + a.id + '">'
-      + '<input type="text" placeholder="Ajouter une note..." id="noteinput-' + a.id + '" value="' + (a.trade_note||"") + '">'
-      + '<button class="btn btn-primary btn-sm" onclick="saveNote(\'' + a.id + '\')">OK</button>'
-      + '</div>'
-
-      + '</div>';
+        <div class="note-zone hidden" id="note-input-zone-${a.id}">
+          <input type="text" placeholder="Ajouter une note..." id="noteinput-${a.id}" value="${a.trade_note||''}">
+          <button class="btn btn-primary btn-sm" onclick="saveNote('${a.id}')">Enregistrer</button>
+        </div>
+      </div>`;
   }).join("");
 }
 
 function toggleExpl(id) {
-  var el  = document.getElementById("expl-" + id);
-  var btn = el ? el.nextElementSibling : null;
+  var el = document.getElementById("expl-" + id);
   if (!el) return;
   var expanded = el.classList.toggle("expanded");
+  var btn = el.nextElementSibling;
   if (btn) btn.textContent = expanded ? "Voir moins ▴" : "Voir plus ▾";
 }
 
-var _pendingResults = {};
-
 async function quickResult(id, result, btn) {
-  // Toggle si déjà actif
   var card = document.getElementById("card-" + id);
   var btns = card.querySelectorAll(".result-btn");
   var wasActive = btn.classList.contains("active-" + result);
 
-  btns.forEach(function(b) { b.classList.remove("active-win","active-loss","active-skip"); });
+  // Reset boutons
+  btns.forEach(b => b.classList.remove("active-win", "active-loss", "active-skip"));
 
   var finalResult = wasActive ? null : result;
   if (!wasActive) btn.classList.add("active-" + result);
 
-  // Afficher zone note
-  var noteZone = document.getElementById("note-" + id);
-  noteZone.classList.toggle("hidden", wasActive);
+  // Affiche la zone de note si on vient de sélectionner un résultat
+  var noteZone = document.getElementById("note-input-zone-" + id);
+  if (!wasActive) noteZone.classList.remove("hidden");
 
-  _pendingResults[id] = finalResult;
+  // Mise à jour visuelle immédiate de la carte
+  card.classList.remove("result-win", "result-loss", "result-skip");
+  if (finalResult) card.classList.add("result-" + finalResult);
 
-  // Sauvegarder résultat immédiatement (sans note)
+  // Sauvegarde backend
   var user = getUser();
-  var existNote = document.getElementById("noteinput-" + id).value;
-  await doSaveResult(id, finalResult, existNote);
+  var pass = await getAuthPassword(user);
+  var currentNote = document.getElementById("noteinput-" + id).value;
 
-  // Mettre à jour la classe de la card
-  card.classList.remove("result-win","result-loss","result-skip");
-  if (finalResult === "win")  card.classList.add("result-win");
-  if (finalResult === "loss") card.classList.add("result-loss");
-  if (finalResult === "skip") card.classList.add("result-skip");
-
-  // Mettre à jour les stats
-  var idx = _allAnalyses.findIndex(function(a){ return a.id == id; });
-  if (idx !== -1) {
-    _allAnalyses[idx].trade_result = finalResult;
-    computeStats(_allAnalyses);
-  }
-}
-
-async function saveNote(id) {
-  var note = document.getElementById("noteinput-" + id).value;
-  var result = _pendingResults[id] !== undefined ? _pendingResults[id] : null;
-
-  // Récupérer le résultat depuis la liste
-  var a = _allAnalyses.find(function(x){ return x.id == id; });
-  if (a) result = a.trade_result;
-
-  await doSaveResult(id, result, note);
-  document.getElementById("note-" + id).classList.add("hidden");
-
-  // Mettre à jour localement
-  var idx = _allAnalyses.findIndex(function(x){ return x.id == id; });
-  if (idx !== -1) _allAnalyses[idx].trade_note = note;
-}
-
-async function doSaveResult(id, result, note) {
-  var user = getUser();
   try {
     await fetch(API + "/update-trade-result", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({email: user.email, password: await getAuthPassword(user), id: id, trade_result: result, trade_note: note || ""})
+      body: JSON.stringify({
+        email: user.email, 
+        password: pass, 
+        id: id, 
+        trade_result: finalResult, 
+        trade_note: currentNote
+      })
     });
-  } catch(e) { /* silencieux */ }
+    
+    // Maj locale
+    var idx = _allAnalyses.findIndex(x => x.id == id);
+    if (idx !== -1) {
+      _allAnalyses[idx].trade_result = finalResult;
+      computeStats(_allAnalyses);
+    }
+  } catch(e) { console.error("Erreur save result:", e); }
+}
+
+async function saveNote(id) {
+  var input = document.getElementById("noteinput-" + id);
+  var note = input.value;
+  var user = getUser();
+  var pass = await getAuthPassword(user);
+  
+  var a = _allAnalyses.find(x => x.id == id);
+  var result = a ? a.trade_result : null;
+
+  try {
+    await fetch(API + "/update-trade-result", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({email: user.email, password: pass, id: id, trade_result: result, trade_note: note})
+    });
+
+    // Maj UI locale
+    var displayZone = document.getElementById("note-display-" + id);
+    displayZone.innerHTML = note ? `<div class="card-note">📝 ${note}</div>` : '';
+    document.getElementById("note-input-zone-" + id).classList.add("hidden");
+    
+    if (a) a.trade_note = note;
+  } catch(e) { alert("Erreur lors de l'enregistrement de la note."); }
 }
 </script>
 </body>
