@@ -220,301 +220,90 @@
 
 <script src="auth.js"></script>
 <script>
-// Assurez-vous que l'API est définie si auth.js ne le fait pas
-if (typeof API === 'undefined') {
-  var API = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
-            ? "http://127.0.0.1:5000" 
-            : "https://trading-ai-7y8g.onrender.com"; // Remplacer par votre URL réelle si nécessaire
-}
+// 1. Détection de l'API avec Logs
+var API = "https://trading-ai-7y8g.onrender.com"; 
+console.log("Tentative de connexion à l'API :", API);
 
 var _allAnalyses  = [];
-var _activeFilter = "all";
-
-var MODEL_LABELS = {
-  "gpt-4o-mini": "MytAI Fast",
-  "gpt-4o":      "MytAI Pro",
-  "gemini":      "MytAI Vision",
-  "claude":      "MytAI Expert"
-};
-
-/**
- * Génère le mot de passe pour les utilisateurs Google
- * Doit correspondre exactement à la logique hash_password(GOOGLE_OAUTH_ + email_hash[:16]) du backend
- */
-async function getAuthPassword(user) {
-  if (user.password && user.password !== "GOOGLE_AUTH") return user.password;
-  
-  // Hash l'email pour obtenir le suffixe
-  var encoder = new TextEncoder();
-  var data = encoder.encode(user.email);
-  var hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  var hashArray  = Array.from(new Uint8Array(hashBuffer));
-  var emailHash  = hashArray.map(b => b.toString(16).padStart(2,"0")).join("").slice(0,16);
-  
-  // Retourne le flag que le backend saura interpréter (qui contient le hash de l'email)
-  return "GOOGLE_OAUTH_" + emailHash;
-}
 
 document.addEventListener("DOMContentLoaded", function() {
-  if (!requireAuth()) return;
+  console.log("Page chargée, vérification de l'auth...");
+  if (!requireAuth()) {
+      console.error("Utilisateur non connecté");
+      return;
+  }
   initNav();
   loadHistory();
 });
 
 async function loadHistory() {
-  var user = getUser();
-  document.getElementById("pageLoader").style.display = "block";
-  document.getElementById("analysesList").style.display = "none";
+  const user = getUser();
+  const loader = document.getElementById("pageLoader");
+  const list = document.getElementById("analysesList");
+
+  console.log("Début du chargement pour :", user.email);
+  loader.style.display = "block";
+  list.style.display = "none";
 
   try {
-    var pass = await getAuthPassword(user);
-    var res  = await fetch(API + "/get-history", {
+    // On simplifie la récupération du mot de passe pour éviter les blocages crypto
+    let pass = user.password;
+    if (pass === "GOOGLE_AUTH") {
+        console.log("Utilisateur Google détecté, génération du pass temporaire...");
+        // Fallback simple si crypto n'est pas dispo
+        try {
+            var encoder = new TextEncoder();
+            var data = encoder.encode(user.email);
+            var hashBuffer = await crypto.subtle.digest("SHA-256", data);
+            var hashArray = Array.from(new Uint8Array(hashBuffer));
+            pass = "GOOGLE_OAUTH_" + hashArray.map(b => b.toString(16).padStart(2,"0")).join("").slice(0,16);
+        } catch(e) {
+            console.warn("Crypto non dispo (HTTP?), utilisation du flag standard");
+            pass = "GOOGLE_AUTH"; 
+        }
+    }
+
+    console.log("Envoi de la requête à /get-history...");
+    
+    // Ajout d'un timeout pour ne pas attendre indéfiniment
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 secondes
+
+    const res = await fetch(API + "/get-history", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({email: user.email, password: pass})
+      body: JSON.stringify({ email: user.email, password: pass }),
+      signal: controller.signal
     });
-    var data = await res.json();
-    if (data.error) { throw new Error(data.error); }
-    
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) throw new Error("Erreur serveur : " + res.status);
+
+    const data = await res.json();
+    console.log("Données reçues :", data.analyses ? data.analyses.length : 0, "analyses");
+
     _allAnalyses = data.analyses || [];
-    computeStats(_allAnalyses);
-    buildAssetFilter(_allAnalyses);
-    applyFilters();
+    
+    if (_allAnalyses.length === 0) {
+        document.getElementById("emptyState").classList.remove("hidden");
+    } else {
+        computeStats(_allAnalyses);
+        buildAssetFilter(_allAnalyses);
+        renderList(_allAnalyses);
+        list.style.display = "flex";
+    }
+
   } catch(e) {
-    console.error("Erreur historique:", e);
-    alert("Erreur lors de la récupération : " + e.message);
+    console.error("ERREUR CRITIQUE :", e);
+    alert("Le serveur met trop de temps à répondre ou est hors ligne. Réessayez dans 30 secondes.");
+    document.getElementById("emptyState").classList.remove("hidden");
   } finally {
-    document.getElementById("pageLoader").style.display = "none";
+    loader.style.display = "none";
   }
 }
 
-function computeStats(analyses) {
-  var total  = analyses.length;
-  var wins   = analyses.filter(a => a.trade_result === "win").length;
-  var losses = analyses.filter(a => a.trade_result === "loss").length;
-  var rated  = wins + losses;
-  var winrate = rated > 0 ? Math.round((wins / rated) * 100) : null;
-
-  document.getElementById("statTotal").textContent = total;
-  document.getElementById("statWinrate").textContent = winrate !== null ? winrate + "%" : "—";
-  
-  var bar = document.getElementById("winrateBar");
-  bar.style.width = (winrate || 0) + "%";
-  bar.style.background = winrate >= 60 ? "#22c55e" : winrate >= 40 ? "#f97316" : "#ef4444";
-
-  // Meilleur modèle
-  var modelStats = {};
-  analyses.forEach(a => {
-    if (!a.modele) return;
-    if (!modelStats[a.modele]) modelStats[a.modele] = {win:0, total:0};
-    if (a.trade_result === "win") { modelStats[a.modele].win++; modelStats[a.modele].total++; }
-    else if (a.trade_result === "loss") { modelStats[a.modele].total++; }
-  });
-  
-  var bestModel = null, bestRate = -1;
-  Object.keys(modelStats).forEach(m => {
-    if (modelStats[m].total >= 2) { // Minimum 2 trades évalués
-      var r = modelStats[m].win / modelStats[m].total;
-      if (r > bestRate) { bestRate = r; bestModel = m; }
-    }
-  });
-  document.getElementById("statBestModel").textContent = bestModel ? (MODEL_LABELS[bestModel] || bestModel) : "—";
-  document.getElementById("statBestModelSub").textContent = bestModel ? (Math.round(bestRate*100) + "% de réussite") : "Données insuffisantes";
-
-  // Actif favori
-  var assetCount = {};
-  analyses.forEach(a => { if (a.asset) assetCount[a.asset] = (assetCount[a.asset] || 0) + 1; });
-  var bestAsset = Object.keys(assetCount).sort((a,b) => assetCount[b] - assetCount[a])[0];
-  document.getElementById("statBestAsset").textContent = bestAsset || "—";
-  document.getElementById("statBestAssetSub").textContent = bestAsset ? assetCount[bestAsset] + " analyses" : "";
-}
-
-function buildAssetFilter(analyses) {
-  var assets = [...new Set(analyses.map(a => a.asset).filter(Boolean))].sort();
-  var sel = document.getElementById("filterAsset");
-  sel.innerHTML = '<option value="">Tous les actifs</option>';
-  assets.forEach(a => {
-    var opt = document.createElement("option");
-    opt.value = a; opt.textContent = a;
-    sel.appendChild(opt);
-  });
-}
-
-function setFilter(filter, btn) {
-  _activeFilter = filter;
-  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-  if (btn) btn.classList.add("active");
-  applyFilters();
-}
-
-function applyFilters() {
-  var assetFilter     = document.getElementById("filterAsset").value;
-  var directionFilter = document.getElementById("filterDirection").value;
-
-  var filtered = _allAnalyses.filter(a => {
-    if (_activeFilter === "win"     && a.trade_result !== "win")  return false;
-    if (_activeFilter === "loss"    && a.trade_result !== "loss") return false;
-    if (_activeFilter === "skip"    && a.trade_result !== "skip") return false;
-    if (_activeFilter === "pending" && a.trade_result !== null)   return false;
-    if (assetFilter     && a.asset     !== assetFilter)     return false;
-    if (directionFilter && a.direction !== directionFilter) return false;
-    return true;
-  });
-
-  renderList(filtered);
-}
-
-function renderList(analyses) {
-  var list  = document.getElementById("analysesList");
-  var empty = document.getElementById("emptyState");
-
-  if (!analyses.length) {
-    list.style.display  = "none";
-    empty.classList.remove("hidden");
-    return;
-  }
-  
-  empty.classList.add("hidden");
-  list.style.display = "flex";
-
-  list.innerHTML = analyses.map(a => {
-    var dirClass  = a.direction === "BUY" ? "badge-buy" : a.direction === "SELL" ? "badge-sell" : "badge-neutre";
-    var cardClass = a.trade_result === "win" ? "result-win" : a.trade_result === "loss" ? "result-loss" : a.trade_result === "skip" ? "result-skip" : "";
-    var dateStr   = a.created_at ? new Date(a.created_at).toLocaleDateString("fr-FR", {day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"}) : "Date inconnue";
-    var modelLabel = MODEL_LABELS[a.modele] || a.modele || "—";
-    var probaColor = a.probabilite >= 70 ? "#22c55e" : a.probabilite >= 50 ? "#f97316" : "#ef4444";
-
-    var resultBadge = "";
-    if      (a.trade_result === "win")  resultBadge = '<span style="color:#22c55e;font-size:0.82rem;font-weight:600;">✅ Gagné</span>';
-    else if (a.trade_result === "loss") resultBadge = '<span style="color:#ef4444;font-size:0.82rem;font-weight:600;">❌ Perdu</span>';
-    else if (a.trade_result === "skip") resultBadge = '<span style="color:var(--muted2);font-size:0.82rem;font-weight:600;">⏭ Non pris</span>';
-    else resultBadge = '<span style="color:var(--muted);font-size:0.82rem;">⏳ En attente</span>';
-
-    return `
-      <div class="analyse-card ${cardClass}" id="card-${a.id}">
-        <div class="card-top">
-          <div>
-            <div class="card-asset">${a.asset || "Actif inconnu"} <span style="font-size:0.75rem;color:var(--muted2);font-weight:400;">· ${a.timeframe || ""}</span></div>
-            <div class="card-meta" style="margin-top:4px;">
-              <span>📅 ${dateStr}</span>
-              <span>🤖 ${modelLabel}</span>
-              ${resultBadge}
-            </div>
-          </div>
-          <span class="badge ${dirClass}" style="font-size:0.9em;padding:5px 14px;">${a.direction || "—"}</span>
-        </div>
-
-        <div class="card-data">
-          <div><div class="data-item-label">Entrées</div><div class="data-item-value">${a.entrees || "—"}</div></div>
-          <div><div class="data-item-label">Stop Loss</div><div class="data-item-value" style="color:#ef4444;">${a.stop_loss || "—"}</div></div>
-          <div><div class="data-item-label">Take Profit</div><div class="data-item-value" style="color:#22c55e;">${a.take_profit || "—"}</div></div>
-          <div><div class="data-item-label">Probabilité</div><div class="data-item-value" style="color:${probaColor};">${a.probabilite ? a.probabilite + "%" : "—"}</div></div>
-        </div>
-
-        ${a.explication ? `
-          <div class="card-explication" id="expl-${a.id}">${a.explication}</div>
-          <button class="btn-toggle-expl" onclick="toggleExpl('${a.id}')">Voir plus ▾</button>
-        ` : ''}
-
-        <div id="note-display-${a.id}">
-          ${a.trade_note ? `<div class="card-note">📝 ${a.trade_note}</div>` : ''}
-        </div>
-
-        <div class="card-bottom">
-          <div style="font-size:0.8rem;color:var(--muted);">Résultat du trade :</div>
-          <div class="result-btns">
-            <button class="result-btn ${a.trade_result==='win'?'active-win':''}" onclick="quickResult('${a.id}','win',this)">✅ Gagné</button>
-            <button class="result-btn ${a.trade_result==='loss'?'active-loss':''}" onclick="quickResult('${a.id}','loss',this)">❌ Perdu</button>
-            <button class="result-btn ${a.trade_result==='skip'?'active-skip':''}" onclick="quickResult('${a.id}','skip',this)">⏭ Non pris</button>
-          </div>
-        </div>
-
-        <div class="note-zone hidden" id="note-input-zone-${a.id}">
-          <input type="text" placeholder="Ajouter une note..." id="noteinput-${a.id}" value="${a.trade_note||''}">
-          <button class="btn btn-primary btn-sm" onclick="saveNote('${a.id}')">Enregistrer</button>
-        </div>
-      </div>`;
-  }).join("");
-}
-
-function toggleExpl(id) {
-  var el = document.getElementById("expl-" + id);
-  if (!el) return;
-  var expanded = el.classList.toggle("expanded");
-  var btn = el.nextElementSibling;
-  if (btn) btn.textContent = expanded ? "Voir moins ▴" : "Voir plus ▾";
-}
-
-async function quickResult(id, result, btn) {
-  var card = document.getElementById("card-" + id);
-  var btns = card.querySelectorAll(".result-btn");
-  var wasActive = btn.classList.contains("active-" + result);
-
-  // Reset boutons
-  btns.forEach(b => b.classList.remove("active-win", "active-loss", "active-skip"));
-
-  var finalResult = wasActive ? null : result;
-  if (!wasActive) btn.classList.add("active-" + result);
-
-  // Affiche la zone de note si on vient de sélectionner un résultat
-  var noteZone = document.getElementById("note-input-zone-" + id);
-  if (!wasActive) noteZone.classList.remove("hidden");
-
-  // Mise à jour visuelle immédiate de la carte
-  card.classList.remove("result-win", "result-loss", "result-skip");
-  if (finalResult) card.classList.add("result-" + finalResult);
-
-  // Sauvegarde backend
-  var user = getUser();
-  var pass = await getAuthPassword(user);
-  var currentNote = document.getElementById("noteinput-" + id).value;
-
-  try {
-    await fetch(API + "/update-trade-result", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({
-        email: user.email, 
-        password: pass, 
-        id: id, 
-        trade_result: finalResult, 
-        trade_note: currentNote
-      })
-    });
-    
-    // Maj locale
-    var idx = _allAnalyses.findIndex(x => x.id == id);
-    if (idx !== -1) {
-      _allAnalyses[idx].trade_result = finalResult;
-      computeStats(_allAnalyses);
-    }
-  } catch(e) { console.error("Erreur save result:", e); }
-}
-
-async function saveNote(id) {
-  var input = document.getElementById("noteinput-" + id);
-  var note = input.value;
-  var user = getUser();
-  var pass = await getAuthPassword(user);
-  
-  var a = _allAnalyses.find(x => x.id == id);
-  var result = a ? a.trade_result : null;
-
-  try {
-    await fetch(API + "/update-trade-result", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({email: user.email, password: pass, id: id, trade_result: result, trade_note: note})
-    });
-
-    // Maj UI locale
-    var displayZone = document.getElementById("note-display-" + id);
-    displayZone.innerHTML = note ? `<div class="card-note">📝 ${note}</div>` : '';
-    document.getElementById("note-input-zone-" + id).classList.add("hidden");
-    
-    if (a) a.trade_note = note;
-  } catch(e) { alert("Erreur lors de l'enregistrement de la note."); }
-}
+// ... garde le reste des fonctions (renderList, computeStats, etc.) de mon précédent message
 </script>
 </body>
 </html>
