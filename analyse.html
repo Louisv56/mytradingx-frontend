@@ -457,7 +457,7 @@ function renderResult(data, savedId) {
       + '<button onclick="saveTradeResult()" class="btn btn-primary btn-sm btn-full">Enregistrer</button>'
       + '</div>'
       + '<div id="tradeResultMsg" style="font-size:0.82rem;color:var(--accent3);margin-top:8px;min-height:18px;"></div>'
-    : '<hr class="divider"><p style="font-size:0.82rem;color:var(--muted);margin-top:8px;">Analyse sauvegardée dans l\'historique.</p>';
+    : '<hr class="divider"><p style="font-size:0.82rem;color:var(--muted);margin-top:8px;">✅ Analyse sauvegardée dans l\'historique.</p>';
 
   result.innerHTML = '<div class="result-box">'
     + (data.modele ? '<div style="font-size:0.75em;color:var(--muted);text-align:right;margin-bottom:12px;">Moteur : ' + (MODEL_INFO[data.modele] ? MODEL_INFO[data.modele].label : data.modele) + '</div>' : '')
