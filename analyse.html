@@ -391,61 +391,65 @@ async function getAuthPassword(user) {
 }
 
 // Retourne l'ID Supabase de l'analyse sauvegardée
-async function saveAnalysis(data, asset, timeframe) {
-  var user = getUser();
-  if (!user) return null;
-  try {
-    var pwd         = await getAuthPassword(user);
-    var entrees     = Array.isArray(data.entrees)     ? data.entrees.join(" / ")     : (data.entrees || "");
-    var take_profit = Array.isArray(data.take_profit) ? data.take_profit.join(" / ") : (data.take_profit || "");
-    var res = await fetch(API + "/save-analysis", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        email:       user.email,
-        password:    pwd,
-        asset:       asset || "",
-        timeframe:   timeframe || "",
-        modele:      data.modele || "",
-        direction:   data.direction || "",
-        entrees:     entrees,
-        stop_loss:   data.stop_loss || "",
-        take_profit: take_profit,
-        probabilite: data.probabilite_succes || null,
-        explication: data.explication || ""
-      })
-    });
-    var saved = await res.json();
-    if (saved.error) { console.error("save-analysis:", saved.error); return null; }
-    return saved.id || null;
-  } catch(e) { console.error("saveAnalysis:", e); return null; }
+async function saveAnalysis() {
+    const user = getUser();
+    const msg = document.getElementById("saveStatus"); // L'élément qui affiche le message
+    
+    if (!user) {
+        alert("Veuillez vous connecter pour sauvegarder.");
+        return;
+    }
+
+    if (msg) {
+        msg.textContent = "⏳ Sauvegarde en cours...";
+        msg.style.color = "var(--accent)";
+    }
+
+    // On récupère le mot de passe (sécurisé pour Google)
+    const pass = await getAuthPassword(user); 
+
+    // On prépare toutes les données à envoyer
+    const dataToSend = {
+        user_email: user.email,
+        password: pass,
+        asset: _currentData.asset,
+        timeframe: _currentData.timeframe,
+        modele: _currentModel,
+        direction: _currentData.direction,
+        entrees: _currentData.entrees,
+        stop_loss: _currentData.stop_loss,
+        take_profit: _currentData.take_profit,
+        probabilite: _currentData.probabilite,
+        explication: _currentData.explication
+    };
+
+    try {
+        const resp = await fetch(API + "/save-analysis", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dataToSend)
+        });
+
+        const result = await resp.json();
+
+        if (resp.ok) {
+            if (msg) {
+                msg.textContent = "✅ Analyse enregistrée dans l'historique !";
+                msg.style.color = "#22c55e";
+            }
+            _currentAnalyseId = result.id; // On garde l'ID pour pouvoir noter le trade plus tard
+            document.getElementById("postAnalysisZone").style.display = "block";
+        } else {
+            throw new Error(result.error || "Erreur lors de l'enregistrement");
+        }
+    } catch (err) {
+        console.error("Erreur:", err);
+        if (msg) {
+            msg.textContent = "❌ " + err.message;
+            msg.style.color = "var(--danger)";
+        }
+    }
 }
-
-var _currentAnalyseId = null;
-var _pendingTradeResult = null;
-
-function renderResult(data, savedId) {
-  _currentAnalyseId  = savedId;
-  _pendingTradeResult = null;
-
-  var placeholder = document.getElementById("resultPlaceholder");
-  var result      = document.getElementById("result");
-  placeholder.classList.add("hidden");
-  result.classList.remove("hidden");
-
-  var dirClass = data.direction === "BUY" ? "badge-buy" : data.direction === "SELL" ? "badge-sell" : "badge-neutre";
-  var confluences = Array.isArray(data.confluences) ? data.confluences.map(function(c){ return "• " + c; }).join("<br>") : "-";
-  var entrees = Array.isArray(data.entrees) ? data.entrees.join(" / ") : (data.entrees || "-");
-  var tps     = Array.isArray(data.take_profit) ? data.take_profit.join(" / ") : (data.take_profit || "-");
-
-  var probaHtml = "";
-  if (data.probabilite_succes !== undefined && data.proba_couleur) {
-    probaHtml = '<div class="result-section">'
-      + '<div class="result-label">Probabilité de succès</div>'
-      + '<div class="proba-row">'
-      + '<span class="proba-dot" style="background:' + data.proba_couleur + '"></span>'
-      + '<span style="font-weight:700;color:' + data.proba_couleur + '">' + data.probabilite_succes + '% — ' + data.proba_label + '</span>'
-      + '</div></div>';
   }
 
   // Boutons feedback — désactivés si pas encore sauvegardé
