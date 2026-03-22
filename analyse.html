@@ -348,12 +348,14 @@ async function analyze() {
   var loader = document.getElementById("loader");
   loader.style.display = "block";
 
-  var formData = new FormData();
-  formData.append("email",    user.email);
-  formData.append("password", user.password);
-  formData.append("model",    selectedModel);
   var asset = document.getElementById("asset").value;
   var tf    = document.getElementById("timeframe").value;
+  var pwd   = await getAuthPassword(user);
+
+  var formData = new FormData();
+  formData.append("email",    user.email);
+  formData.append("password", pwd);
+  formData.append("model",    selectedModel);
   if (asset) formData.append("asset", asset);
   if (tf)    formData.append("timeframe", tf);
   if (imageHTF.files.length) formData.append("image_htf", imageHTF.files[0]);
@@ -368,8 +370,7 @@ async function analyze() {
     user.analyses_utilisees = (user.analyses_utilisees || 0) + 1;
     saveUser(user);
     updateQuota();
-    // Sauvegarder d'abord, récupérer l'ID, puis afficher les boutons feedback
-    var savedId = await saveAnalysis(data, document.getElementById("asset").value, document.getElementById("timeframe").value);
+    var savedId = await saveAnalysis(data, asset, tf);
     renderResult(data, savedId);
   } catch(e) {
     alert("Erreur réseau : " + e.message);
@@ -378,81 +379,71 @@ async function analyze() {
   }
 }
 
-// Retourne le bon password à envoyer au backend (supporte Google Auth)
 async function getAuthPassword(user) {
   if (user.password !== "GOOGLE_AUTH") return user.password;
-  // Recalculer le hash Google côté frontend via SHA-256
   var encoder = new TextEncoder();
-  var data = encoder.encode(user.email);
-  var hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  var hashArray  = Array.from(new Uint8Array(hashBuffer));
-  var emailHash  = hashArray.map(function(b){ return b.toString(16).padStart(2,"0"); }).join("").slice(0,16);
-  return "GOOGLE_OAUTH_" + emailHash;
+  var buf  = await crypto.subtle.digest("SHA-256", encoder.encode(user.email.toLowerCase().trim()));
+  var hex  = Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+  return "GOOGLE_OAUTH_" + hex.slice(0, 16);
 }
 
-// Retourne l'ID Supabase de l'analyse sauvegardée
-async function saveAnalysis() {
-    const user = getUser();
-    const msg = document.getElementById("saveStatus"); // L'élément qui affiche le message
-    
-    if (!user) {
-        alert("Veuillez vous connecter pour sauvegarder.");
-        return;
-    }
-
-    if (msg) {
-        msg.textContent = "⏳ Sauvegarde en cours...";
-        msg.style.color = "var(--accent)";
-    }
-
-    // On récupère le mot de passe (sécurisé pour Google)
-    const pass = await getAuthPassword(user); 
-
-    // On prépare toutes les données à envoyer
-    const dataToSend = {
-        user_email: user.email,
-        password: pass,
-        asset: _currentData.asset,
-        timeframe: _currentData.timeframe,
-        modele: _currentModel,
-        direction: _currentData.direction,
-        entrees: _currentData.entrees,
-        stop_loss: _currentData.stop_loss,
-        take_profit: _currentData.take_profit,
-        probabilite: _currentData.probabilite,
-        explication: _currentData.explication
-    };
-
-    try {
-        const resp = await fetch(API + "/save-analysis", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dataToSend)
-        });
-
-        const result = await resp.json();
-
-        if (resp.ok) {
-            if (msg) {
-                msg.textContent = "✅ Analyse enregistrée dans l'historique !";
-                msg.style.color = "#22c55e";
-            }
-            _currentAnalyseId = result.id; // On garde l'ID pour pouvoir noter le trade plus tard
-            document.getElementById("postAnalysisZone").style.display = "block";
-        } else {
-            throw new Error(result.error || "Erreur lors de l'enregistrement");
-        }
-    } catch (err) {
-        console.error("Erreur:", err);
-        if (msg) {
-            msg.textContent = "❌ " + err.message;
-            msg.style.color = "var(--danger)";
-        }
-    }
+async function saveAnalysis(data, asset, timeframe) {
+  var user = getUser();
+  if (!user) return null;
+  try {
+    var pwd         = await getAuthPassword(user);
+    var entrees     = Array.isArray(data.entrees)     ? data.entrees.join(" / ")     : (data.entrees || "");
+    var take_profit = Array.isArray(data.take_profit) ? data.take_profit.join(" / ") : (data.take_profit || "");
+    var res = await fetch(API + "/save-analysis", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        email:       user.email,
+        password:    pwd,
+        asset:       asset || "",
+        timeframe:   timeframe || "",
+        modele:      data.modele || "",
+        direction:   data.direction || "",
+        entrees:     entrees,
+        stop_loss:   data.stop_loss || "",
+        take_profit: take_profit,
+        probabilite: data.probabilite_succes || null,
+        explication: data.explication || ""
+      })
+    });
+    var saved = await res.json();
+    if (saved.error) { console.error("save-analysis:", saved.error); return null; }
+    return saved.id || null;
+  } catch(e) { console.error("saveAnalysis:", e); return null; }
 }
+
+var _currentAnalyseId  = null;
+var _pendingTradeResult = null;
+
+function renderResult(data, savedId) {
+  _currentAnalyseId   = savedId;
+  _pendingTradeResult = null;
+
+  var placeholder = document.getElementById("resultPlaceholder");
+  var result      = document.getElementById("result");
+  placeholder.classList.add("hidden");
+  result.classList.remove("hidden");
+
+  var dirClass    = data.direction === "BUY" ? "badge-buy" : data.direction === "SELL" ? "badge-sell" : "badge-neutre";
+  var confluences = Array.isArray(data.confluences) ? data.confluences.map(function(c){ return "• " + c; }).join("<br>") : "-";
+  var entrees     = Array.isArray(data.entrees)     ? data.entrees.join(" / ")     : (data.entrees || "-");
+  var tps         = Array.isArray(data.take_profit) ? data.take_profit.join(" / ") : (data.take_profit || "-");
+
+  var probaHtml = "";
+  if (data.probabilite_succes !== undefined && data.proba_couleur) {
+    probaHtml = '<div class="result-section">'
+      + '<div class="result-label">Probabilité de succès</div>'
+      + '<div class="proba-row">'
+      + '<span class="proba-dot" style="background:' + data.proba_couleur + '"></span>'
+      + '<span style="font-weight:700;color:' + data.proba_couleur + '">' + data.probabilite_succes + '% — ' + data.proba_label + '</span>'
+      + '</div></div>';
   }
 
-  // Boutons feedback — désactivés si pas encore sauvegardé
   var feedbackHtml = savedId
     ? '<hr class="divider">'
       + '<div class="result-label" style="margin-bottom:10px;">Ce trade s\'est-il bien passé ?</div>'
@@ -521,16 +512,6 @@ async function saveTradeResult() {
   } catch(e) {
     if (msg) msg.textContent = "Erreur lors de l'enregistrement.";
   }
-}
-  // Fonction de sécurité pour synchroniser les mots de passe Google avec le serveur
-async function getAuthPassword(user) {
-    if (user.password !== "GOOGLE_AUTH") return user.password;
-    
-    const emailClean = user.email.toLowerCase().trim();
-    const msgBuffer = new TextEncoder().encode(emailClean);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
 }
 </script>
 </body>
