@@ -220,90 +220,230 @@
 
 <script src="auth.js"></script>
 <script>
-// 1. Détection de l'API avec Logs
-var API = "https://trading-ai-7y8g.onrender.com"; 
-console.log("Tentative de connexion à l'API :", API);
-
 var _allAnalyses  = [];
+var _activeFilter = "all";
+
+var MODEL_LABELS = {
+  "gpt-4o-mini": "MytAI Fast",
+  "gpt-4o":      "MytAI Pro",
+  "gemini":      "MytAI Vision",
+  "claude":      "MytAI Expert"
+};
+
+async function getAuthPassword(user) {
+  if (user.password !== "GOOGLE_AUTH") return user.password;
+  var encoder = new TextEncoder();
+  var buf  = await crypto.subtle.digest("SHA-256", encoder.encode(user.email.toLowerCase().trim()));
+  var hex  = Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+  return "GOOGLE_OAUTH_" + hex.slice(0, 16);
+}
 
 document.addEventListener("DOMContentLoaded", function() {
-  console.log("Page chargée, vérification de l'auth...");
-  if (!requireAuth()) {
-      console.error("Utilisateur non connecté");
-      return;
-  }
+  if (!requireAuth()) return;
   initNav();
   loadHistory();
 });
 
 async function loadHistory() {
-  const user = getUser();
-  const loader = document.getElementById("pageLoader");
-  const list = document.getElementById("analysesList");
-
-  console.log("Début du chargement pour :", user.email);
+  var user   = getUser();
+  var loader = document.getElementById("pageLoader");
+  var list   = document.getElementById("analysesList");
   loader.style.display = "block";
-  list.style.display = "none";
-
+  list.style.display   = "none";
   try {
-    // On simplifie la récupération du mot de passe pour éviter les blocages crypto
-    let pass = user.password;
-    if (pass === "GOOGLE_AUTH") {
-        console.log("Utilisateur Google détecté, génération du pass temporaire...");
-        // Fallback simple si crypto n'est pas dispo
-        try {
-            var encoder = new TextEncoder();
-            var data = encoder.encode(user.email);
-            var hashBuffer = await crypto.subtle.digest("SHA-256", data);
-            var hashArray = Array.from(new Uint8Array(hashBuffer));
-            pass = "GOOGLE_OAUTH_" + hashArray.map(b => b.toString(16).padStart(2,"0")).join("").slice(0,16);
-        } catch(e) {
-            console.warn("Crypto non dispo (HTTP?), utilisation du flag standard");
-            pass = "GOOGLE_AUTH"; 
-        }
-    }
-
-    console.log("Envoi de la requête à /get-history...");
-    
-    // Ajout d'un timeout pour ne pas attendre indéfiniment
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 secondes
-
-    const res = await fetch(API + "/get-history", {
+    var pwd = await getAuthPassword(user);
+    var res = await fetch(API + "/get-history", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ email: user.email, password: pass }),
-      signal: controller.signal
+      body: JSON.stringify({email: user.email, password: pwd})
     });
-
-    clearTimeout(timeoutId);
-
-    if (!res.ok) throw new Error("Erreur serveur : " + res.status);
-
-    const data = await res.json();
-    console.log("Données reçues :", data.analyses ? data.analyses.length : 0, "analyses");
-
+    var data = await res.json();
+    if (data.error) { alert("Erreur : " + data.error); return; }
     _allAnalyses = data.analyses || [];
-    
-    if (_allAnalyses.length === 0) {
-        document.getElementById("emptyState").classList.remove("hidden");
-    } else {
-        computeStats(_allAnalyses);
-        buildAssetFilter(_allAnalyses);
-        renderList(_allAnalyses);
-        list.style.display = "flex";
-    }
-
+    computeStats(_allAnalyses);
+    buildAssetFilter(_allAnalyses);
+    applyFilters();
   } catch(e) {
-    console.error("ERREUR CRITIQUE :", e);
-    alert("Le serveur met trop de temps à répondre ou est hors ligne. Réessayez dans 30 secondes.");
-    document.getElementById("emptyState").classList.remove("hidden");
+    alert("Erreur réseau : " + e.message);
   } finally {
     loader.style.display = "none";
   }
 }
 
-// ... garde le reste des fonctions (renderList, computeStats, etc.) de mon précédent message
+function computeStats(analyses) {
+  var total = analyses.length;
+  var wins  = analyses.filter(function(a){ return a.trade_result === "win"; }).length;
+  var losses= analyses.filter(function(a){ return a.trade_result === "loss"; }).length;
+  var rated = wins + losses;
+  var winrate = rated > 0 ? Math.round((wins / rated) * 100) : null;
+
+  document.getElementById("statTotal").textContent   = total;
+  document.getElementById("statWinrate").textContent = winrate !== null ? winrate + "%" : "—";
+  document.getElementById("winrateBar").style.width  = (winrate || 0) + "%";
+  document.getElementById("winrateBar").style.background = winrate >= 60 ? "var(--accent3)" : winrate >= 40 ? "var(--warning)" : "var(--danger)";
+
+  var modelStats = {};
+  analyses.forEach(function(a) {
+    if (!a.modele) return;
+    if (!modelStats[a.modele]) modelStats[a.modele] = {win:0, total:0};
+    if (a.trade_result === "win")  { modelStats[a.modele].win++; modelStats[a.modele].total++; }
+    if (a.trade_result === "loss") { modelStats[a.modele].total++; }
+  });
+  var bestModel = null, bestRate = -1;
+  Object.keys(modelStats).forEach(function(m) {
+    var s = modelStats[m];
+    if (s.total > 0 && s.win/s.total > bestRate) { bestRate = s.win/s.total; bestModel = m; }
+  });
+  document.getElementById("statBestModel").textContent    = bestModel ? (MODEL_LABELS[bestModel] || bestModel) : "—";
+  document.getElementById("statBestModelSub").textContent = bestModel ? Math.round(bestRate*100) + "% de réussite" : "Pas encore de données";
+
+  var assetCount = {};
+  analyses.forEach(function(a) { if (a.asset) assetCount[a.asset] = (assetCount[a.asset]||0)+1; });
+  var bestAsset = Object.keys(assetCount).sort(function(a,b){ return assetCount[b]-assetCount[a]; })[0];
+  document.getElementById("statBestAsset").textContent    = bestAsset || "—";
+  document.getElementById("statBestAssetSub").textContent = bestAsset ? assetCount[bestAsset] + " analyses" : "";
+}
+
+function buildAssetFilter(analyses) {
+  var assets = analyses.map(function(a){ return a.asset; }).filter(Boolean);
+  var unique = assets.filter(function(v,i,s){ return s.indexOf(v)===i; }).sort();
+  var sel = document.getElementById("filterAsset");
+  unique.forEach(function(a) {
+    var opt = document.createElement("option");
+    opt.value = a; opt.textContent = a; sel.appendChild(opt);
+  });
+}
+
+function setFilter(filter, btn) {
+  _activeFilter = filter;
+  document.querySelectorAll(".filter-btn").forEach(function(b){ b.classList.remove("active"); });
+  if (btn) btn.classList.add("active");
+  applyFilters();
+}
+
+function applyFilters() {
+  var assetF = document.getElementById("filterAsset").value;
+  var dirF   = document.getElementById("filterDirection").value;
+  var filtered = _allAnalyses.filter(function(a) {
+    if (_activeFilter === "win"     && a.trade_result !== "win")  return false;
+    if (_activeFilter === "loss"    && a.trade_result !== "loss") return false;
+    if (_activeFilter === "skip"    && a.trade_result !== "skip") return false;
+    if (_activeFilter === "pending" && a.trade_result !== null)   return false;
+    if (assetF && a.asset     !== assetF) return false;
+    if (dirF   && a.direction !== dirF)   return false;
+    return true;
+  });
+  renderList(filtered);
+}
+
+function renderList(analyses) {
+  var list  = document.getElementById("analysesList");
+  var empty = document.getElementById("emptyState");
+  if (!analyses.length) {
+    list.style.display = "none";
+    empty.classList.remove("hidden");
+    return;
+  }
+  empty.classList.add("hidden");
+  list.style.display = "flex";
+
+  list.innerHTML = analyses.map(function(a) {
+    var dirClass   = a.direction === "BUY" ? "badge-buy" : a.direction === "SELL" ? "badge-sell" : "badge-neutre";
+    var cardClass  = a.trade_result === "win" ? "result-win" : a.trade_result === "loss" ? "result-loss" : a.trade_result === "skip" ? "result-skip" : "";
+    var dateStr    = a.created_at ? new Date(a.created_at).toLocaleDateString("fr-FR",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}) : "";
+    var modelLabel = MODEL_LABELS[a.modele] || a.modele || "—";
+    var probaColor = a.probabilite >= 70 ? "var(--accent3)" : a.probabilite >= 50 ? "var(--warning)" : "var(--danger)";
+    var resultBadge = a.trade_result === "win"  ? '<span style="color:var(--accent3);font-size:0.82rem;font-weight:600;">✅ Gagné</span>'
+                    : a.trade_result === "loss" ? '<span style="color:var(--danger);font-size:0.82rem;font-weight:600;">❌ Perdu</span>'
+                    : a.trade_result === "skip" ? '<span style="color:var(--muted2);font-size:0.82rem;font-weight:600;">⏭ Non pris</span>'
+                    : '<span style="color:var(--muted);font-size:0.82rem;">⏳ En attente</span>';
+
+    return '<div class="analyse-card ' + cardClass + '" id="card-' + a.id + '">'
+      + '<div class="card-top">'
+      + '<div><div class="card-asset">' + (a.asset||"Actif inconnu")
+      + (a.timeframe ? ' <span style="font-size:0.75rem;color:var(--muted2);font-weight:400;">· '+a.timeframe+'</span>' : '')
+      + '</div>'
+      + '<div class="card-meta" style="margin-top:4px;"><span>📅 '+dateStr+'</span><span>🤖 '+modelLabel+'</span>'+resultBadge+'</div></div>'
+      + '<span class="badge '+dirClass+'" style="font-size:0.9em;padding:5px 14px;">'+(a.direction||"—")+'</span>'
+      + '</div>'
+      + '<div class="card-data">'
+      + '<div><div class="data-item-label">Entrées</div><div class="data-item-value">'+(a.entrees||"—")+'</div></div>'
+      + '<div><div class="data-item-label">Stop Loss</div><div class="data-item-value" style="color:var(--danger);">'+(a.stop_loss||"—")+'</div></div>'
+      + '<div><div class="data-item-label">Take Profit</div><div class="data-item-value" style="color:var(--accent3);">'+(a.take_profit||"—")+'</div></div>'
+      + '<div><div class="data-item-label">Probabilité</div><div class="data-item-value" style="color:'+probaColor+';">'+(a.probabilite ? a.probabilite+"%" : "—")+'</div></div>'
+      + '</div>'
+      + (a.explication ? '<div class="card-explication" id="expl-'+a.id+'">'+a.explication+'</div>'
+        +'<button class="btn-toggle-expl" onclick="toggleExpl(\''+a.id+'\')">Voir plus ▾</button>' : '')
+      + (a.trade_note ? '<div class="card-note">📝 '+a.trade_note+'</div>' : '')
+      + '<div class="card-bottom">'
+      + '<div style="font-size:0.8rem;color:var(--muted);">Ce trade s\'est-il bien passé ?</div>'
+      + '<div class="result-btns">'
+      + '<button class="result-btn '+(a.trade_result==="win"?"active-win":"")+'" onclick="quickResult(\''+a.id+'\',\'win\',this)">✅ Gagné</button>'
+      + '<button class="result-btn '+(a.trade_result==="loss"?"active-loss":"")+'" onclick="quickResult(\''+a.id+'\',\'loss\',this)">❌ Perdu</button>'
+      + '<button class="result-btn '+(a.trade_result==="skip"?"active-skip":"")+'" onclick="quickResult(\''+a.id+'\',\'skip\',this)">⏭ Non pris</button>'
+      + '</div></div>'
+      + '<div class="note-zone hidden" id="note-'+a.id+'">'
+      + '<input type="text" placeholder="Ajouter une note..." id="noteinput-'+a.id+'" value="'+(a.trade_note||"")+'">'
+      + '<button class="btn btn-primary btn-sm" onclick="saveNote(\''+a.id+'\')">OK</button>'
+      + '</div>'
+      + '</div>';
+  }).join("");
+}
+
+function toggleExpl(id) {
+  var el  = document.getElementById("expl-" + id);
+  var btn = el ? el.nextElementSibling : null;
+  if (!el) return;
+  var expanded = el.classList.toggle("expanded");
+  if (btn) btn.textContent = expanded ? "Voir moins ▴" : "Voir plus ▾";
+}
+
+var _pendingResults = {};
+
+async function quickResult(id, result, btn) {
+  var card = document.getElementById("card-" + id);
+  var btns = card.querySelectorAll(".result-btn");
+  var wasActive = btn.classList.contains("active-" + result);
+  btns.forEach(function(b){ b.classList.remove("active-win","active-loss","active-skip"); });
+  var finalResult = wasActive ? null : result;
+  if (!wasActive) btn.classList.add("active-" + result);
+
+  var noteZone = document.getElementById("note-" + id);
+  noteZone.classList.toggle("hidden", wasActive);
+  _pendingResults[id] = finalResult;
+
+  var existNote = document.getElementById("noteinput-" + id).value;
+  await doSaveResult(id, finalResult, existNote);
+
+  card.classList.remove("result-win","result-loss","result-skip");
+  if (finalResult === "win")  card.classList.add("result-win");
+  if (finalResult === "loss") card.classList.add("result-loss");
+  if (finalResult === "skip") card.classList.add("result-skip");
+
+  var idx = _allAnalyses.findIndex(function(a){ return a.id == id; });
+  if (idx !== -1) { _allAnalyses[idx].trade_result = finalResult; computeStats(_allAnalyses); }
+}
+
+async function saveNote(id) {
+  var note = document.getElementById("noteinput-" + id).value;
+  var a    = _allAnalyses.find(function(x){ return x.id == id; });
+  await doSaveResult(id, a ? a.trade_result : null, note);
+  document.getElementById("note-" + id).classList.add("hidden");
+  var idx = _allAnalyses.findIndex(function(x){ return x.id == id; });
+  if (idx !== -1) _allAnalyses[idx].trade_note = note;
+}
+
+async function doSaveResult(id, result, note) {
+  var user = getUser();
+  try {
+    var pwd = await getAuthPassword(user);
+    await fetch(API + "/update-trade-result", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({email: user.email, password: pwd, id: id, trade_result: result, trade_note: note || ""})
+    });
+  } catch(e) { /* silencieux */ }
+}
 </script>
 </body>
 </html>
