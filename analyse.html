@@ -522,6 +522,16 @@ async function saveTradeResult() {
     if (msg) msg.textContent = "Erreur lors de l'enregistrement.";
   }
 }
+  // Fonction de sécurité pour synchroniser les mots de passe Google avec le serveur
+async function getAuthPassword(user) {
+    if (user.password !== "GOOGLE_AUTH") return user.password;
+    
+    const emailClean = user.email.toLowerCase().trim();
+    const msgBuffer = new TextEncoder().encode(emailClean);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+}
 </script>
 </body>
 </html>
