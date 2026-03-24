@@ -69,21 +69,28 @@
   <div class="container">
 
     <div style="margin-bottom:24px;">
-      <div class="section-label">MytAI <span class="badge badge-pro-tag">PRO</span></div>
+      <div class="section-label">MytAI</div>
       <h1>Analyse Fondamentale</h1>
       <p style="margin-top:8px;">MytAI analyse l'actualité du jour pour déterminer si le marché est haussier ou baissier.</p>
     </div>
 
-    <!-- Si pas Pro → banner lock -->
-    <div id="proLockBanner" class="pro-lock-banner hidden">
-      <div style="font-size:3rem;margin-bottom:16px;">🔒</div>
-      <h2>Fonctionnalité Pro</h2>
-      <p>L'analyse fondamentale est réservée aux abonnés Pro.<br>Passez au plan Pro pour accéder à l'actualité des marchés en temps réel.</p>
-      <button class="btn btn-pro btn-lg" onclick="openUpgradeModal()">Passer au plan Pro — 19€/mois</button>
-      <p style="margin-top:12px;font-size:0.78rem;">Prix de lancement · Sans engagement</p>
+    <!-- Quota bar fondamental -->
+    <div class="quota-bar mb-4" id="fundQuotaBar" style="display:none;">
+      <span id="fundQuotaLabel" style="font-size:0.85rem;white-space:nowrap;"></span>
+      <div class="quota-track"><div class="quota-fill" id="fundQuotaFill"></div></div>
+      <span id="fundQuotaMax" style="font-size:0.82rem;color:var(--muted2);white-space:nowrap;"></span>
     </div>
 
-    <!-- Interface fondamentale (Pro uniquement) -->
+    <!-- Si pas connecté → banner connexion -->
+    <div id="proLockBanner" class="pro-lock-banner hidden">
+      <div style="font-size:3rem;margin-bottom:16px;">🔐</div>
+      <h2 style="color:var(--accent);">Connecte-toi pour accéder</h2>
+      <p>Crée un compte gratuit et reçois 1 analyse fondamentale offerte chaque mois.</p>
+      <a href="login.html?tab=register" class="btn btn-primary btn-lg">Créer un compte gratuit</a>
+      <p style="margin-top:12px;font-size:0.78rem;">Déjà un compte ? <a href="login.html" style="color:var(--accent);">Se connecter</a></p>
+    </div>
+
+    <!-- Interface fondamentale (tous les plans) -->
     <div id="fondContent" class="hidden">
       <div class="fond-layout">
 
@@ -128,19 +135,30 @@
 
 <!-- ── Upgrade Modal ── -->
 <div id="upgradeModal" class="modal-overlay">
-  <div class="modal-box" style="max-width:420px;text-align:center;">
-    <h2>Plan Pro requis</h2>
+  <div class="modal-box" style="max-width:560px;">
+    <h2>Augmentez votre quota</h2>
     <div style="background:#7c3aed15;border:1px solid #7c3aed33;border-radius:8px;padding:8px 14px;margin:12px 0;font-size:0.82em;color:#a78bfa;">
-      🎉 <strong>Prix de lancement</strong> — 19€/mois au lieu de 39€
+      🎉 <strong>Prix de lancement</strong> — Offre limitée aux 50 premiers abonnés
     </div>
-    <div class="plan-card popular" style="margin:16px 0;">
-      <div style="font-weight:700;margin-bottom:4px;color:#a78bfa;">⭐ Pro</div>
-      <div class="plan-price-old">39€/mois</div>
-      <div class="price" style="font-family:'Syne',sans-serif;font-size:2em;font-weight:800;color:#a78bfa;">19€<span style="font-size:0.45em;color:var(--muted2);">/mois</span></div>
-      <ul style="text-align:left;"><li>Analyses illimitées</li><li>MytAI Fast, Pro, Vision, Expert</li><li>Analyse Fondamentale ✓</li></ul>
-      <button class="btn btn-pro btn-full" onclick="subscribe('pro')">Choisir Pro</button>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div style="font-weight:700;margin-bottom:4px;">Premium</div>
+        <div class="plan-price-old">19€/mois</div>
+        <div class="price" style="font-family:'Syne',sans-serif;font-size:1.8em;font-weight:800;color:var(--accent);">9€<span style="font-size:0.5em;color:var(--muted2);">/mois</span></div>
+        <div class="plan-economy">Économisez 10€/mois</div>
+        <ul><li>50 analyses graphiques/mois</li><li>20 analyses fondamentales/mois</li><li>MytAI Fast, Pro, Vision</li></ul>
+        <button class="btn btn-outline btn-full" onclick="subscribe('premium')">Choisir Premium</button>
+      </div>
+      <div class="plan-card popular">
+        <div style="font-weight:700;margin-bottom:4px;color:#a78bfa;">⭐ Pro</div>
+        <div class="plan-price-old">39€/mois</div>
+        <div class="price" style="font-family:'Syne',sans-serif;font-size:1.8em;font-weight:800;color:#a78bfa;">19€<span style="font-size:0.5em;color:var(--muted2);">/mois</span></div>
+        <div class="plan-economy">Économisez 20€/mois</div>
+        <ul><li>Analyses graphiques illimitées</li><li>Analyses fondamentales illimitées</li><li>Tous les moteurs MytAI</li></ul>
+        <button class="btn btn-pro btn-full" onclick="subscribe('pro')">Choisir Pro</button>
+      </div>
     </div>
-    <p style="font-size:0.72em;color:var(--muted);">Sans engagement · Résiliable à tout moment</p>
+    <p style="font-size:0.72em;color:var(--muted);text-align:center;margin-top:8px;">Sans engagement · Résiliable à tout moment</p>
     <button class="btn btn-secondary btn-full mt-4" onclick="closeUpgradeModal()">Fermer</button>
   </div>
 </div>
@@ -164,28 +182,54 @@
 
 <script src="auth.js"></script>
 <script>
+var FUND_LIMITS = {free: 1, premium: 20, pro: null};
+
 document.addEventListener("DOMContentLoaded", function() {
   initNav();
   checkPaymentReturn();
   var user = getUser();
 
   if (!user) {
-    // Pas connecté → montre le lock + bouton connexion dans la nav
     document.getElementById("proLockBanner").classList.remove("hidden");
     return;
   }
 
-  if (user.plan !== "pro") {
-    document.getElementById("proLockBanner").classList.remove("hidden");
-  } else {
-    document.getElementById("fondContent").classList.remove("hidden");
-  }
+  document.getElementById("fondContent").classList.remove("hidden");
+  updateFundQuota(user);
 });
+
+function updateFundQuota(user) {
+  var plan  = user.plan;
+  var limit = FUND_LIMITS[plan];
+  var used  = user.fond_utilisees || 0;
+  var bar   = document.getElementById("fundQuotaBar");
+
+  bar.style.display = "flex";
+
+  if (limit === null) {
+    document.getElementById("fundQuotaLabel").textContent = used + " analyses fondamentales";
+    document.getElementById("fundQuotaFill").style.width = "30%";
+    document.getElementById("fundQuotaFill").style.background = "var(--accent2)";
+    document.getElementById("fundQuotaMax").textContent = "Pro — Illimité";
+  } else {
+    var left = Math.max(0, limit - used);
+    var pct  = Math.min(100, (used / limit) * 100);
+    document.getElementById("fundQuotaLabel").textContent = used + "/" + limit + " analyses fondamentales";
+    document.getElementById("fundQuotaFill").style.width  = pct + "%";
+    document.getElementById("fundQuotaFill").style.background = pct >= 90 ? "var(--danger)" : pct >= 60 ? "var(--warning)" : "var(--accent)";
+    document.getElementById("fundQuotaMax").textContent = plan === "free" ? "Gratuit" : "Premium";
+  }
+}
 
 async function analyzeFundamental() {
   var user = getUser();
   if (!user) { openAuthModal(); return; }
-  if (user.plan !== "pro") { openUpgradeModal(); return; }
+
+  var plan  = user.plan;
+  var limit = FUND_LIMITS[plan];
+  var used  = user.fond_utilisees || 0;
+
+  if (limit !== null && used >= limit) { openUpgradeModal(); return; }
 
   var asset = document.getElementById("fundAsset").value.trim();
   if (!asset) { alert("Saisis un actif (ex: BTC, EURUSD, Gold)"); return; }
@@ -196,20 +240,34 @@ async function analyzeFundamental() {
   document.getElementById("fundPlaceholder").classList.remove("hidden");
 
   try {
-    var res  = await fetch(API + "/fundamental", {
+    var pwd = await getAuthPassword(user);
+    var res = await fetch(API + "/fundamental", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({email: user.email, password: user.password, asset})
+      body: JSON.stringify({email: user.email, password: pwd, asset})
     });
     var data = await res.json();
-    if (data.error === "PRO_ONLY") { openUpgradeModal(); return; }
+    if (data.error === "FUND_LIMIT_REACHED") { openUpgradeModal(); return; }
     if (data.error) { alert("Erreur : " + data.error); return; }
+
+    // Mettre à jour le compteur local
+    user.fond_utilisees = data.fond_utilisees || (used + 1);
+    saveUser(user);
+    updateFundQuota(user);
     renderFundamental(data);
   } catch(e) {
     alert("Erreur réseau : " + e.message);
   } finally {
     loader.style.display = "none";
   }
+}
+
+async function getAuthPassword(user) {
+  if (user.password !== "GOOGLE_AUTH") return user.password;
+  var encoder = new TextEncoder();
+  var buf  = await crypto.subtle.digest("SHA-256", encoder.encode(user.email.toLowerCase().trim()));
+  var hex  = Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+  return "GOOGLE_OAUTH_" + hex.slice(0, 16);
 }
 
 function resetFundamental() {
@@ -246,6 +304,13 @@ function renderFundamental(data) {
     });
   }
 
+  // Afficher les analyses restantes si limité
+  var quotaHtml = "";
+  if (data.fond_restantes !== null && data.fond_restantes !== undefined) {
+    quotaHtml = '<div style="font-size:0.78em;color:var(--muted);text-align:right;margin-top:8px;">'
+      + data.fond_restantes + ' analyse(s) fondamentale(s) restante(s) ce mois</div>';
+  }
+
   result.innerHTML = '<div class="result-box">'
     + '<div style="margin-bottom:16px;">'
     + '<div class="result-label" style="margin-bottom:8px;">Sentiment — ' + data.actif + '</div>'
@@ -253,22 +318,16 @@ function renderFundamental(data) {
     + '<span style="width:12px;height:12px;border-radius:50%;background:' + color + ';display:inline-block;"></span>'
     + '<span style="color:' + color + '">' + data.sentiment + '</span>'
     + (data.confiance ? '<span style="color:var(--muted2);font-size:0.82em;">— ' + data.confiance + '% de confiance</span>' : '')
-    + '</div>'
-    + '</div>'
-
+    + '</div></div>'
     + '<div class="result-section"><div class="result-label">Résumé</div>' + (data.resume||"") + '</div>'
-
     + '<div style="margin:14px 0;">'
     + '<div class="result-label" style="border-left:3px solid var(--accent);padding-left:10px;margin-bottom:8px;">News clés du jour</div>'
-    + newsHtml
-    + '</div>'
-
+    + newsHtml + '</div>'
     + (facteursHtml ? '<div class="result-section"><div class="result-label">À surveiller</div>' + facteursHtml + '</div>' : '')
-
     + '<hr class="divider">'
     + '<div class="result-section"><div class="result-label">Conclusion</div>' + (data.conclusion||"") + '</div>'
-
     + (data.nb_news ? '<div style="font-size:0.72em;color:var(--muted);text-align:right;margin-top:8px;">' + data.nb_news + ' articles analysés</div>' : '')
+    + quotaHtml
     + '</div>';
 }
 </script>
