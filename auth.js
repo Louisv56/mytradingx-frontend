@@ -38,6 +38,15 @@ function requireAuth() {
 }
 
 // ── Nav ───────────────────────────────────────────────────────────────────────
+function maskEmail(email) {
+  if (!email) return "";
+  var parts  = email.split("@");
+  var name   = parts[0];
+  var domain = parts[1];
+  if (name.length <= 2) return name[0] + "***@" + domain;
+  return name[0] + name[1] + "***" + name[name.length - 1] + "@" + domain;
+}
+
 function initNav() {
   var user = getUser();
   var navUser    = document.getElementById("navUser");
@@ -46,7 +55,7 @@ function initNav() {
   var navLogout  = document.getElementById("navLogout");
 
   if (user) {
-    if (navUser)   { navUser.textContent = user.email; navUser.classList.remove("hidden"); }
+    if (navUser)   { navUser.textContent = maskEmail(user.email); navUser.classList.remove("hidden"); }
     if (navPlan)   {
       var labels = {free:"FREE", premium:"PREMIUM", pro:"PRO"};
       var classes = {free:"plan-free", premium:"plan-premium", pro:"plan-pro"};
@@ -67,6 +76,85 @@ function initNav() {
   var page = window.location.pathname.split("/").pop() || "index.html";
   document.querySelectorAll(".nav-links a").forEach(function(a) {
     if (a.getAttribute("href") === page) a.classList.add("active");
+  });
+
+  // Hamburger mobile
+  injectHamburger(user, page);
+}
+
+function injectHamburger(user, page) {
+  var nav = document.querySelector("nav");
+  if (!nav || document.getElementById("hamburgerBtn")) return;
+
+  var btn = document.createElement("button");
+  btn.className = "hamburger";
+  btn.id        = "hamburgerBtn";
+  btn.setAttribute("aria-label", "Menu");
+  btn.innerHTML = "<span></span><span></span><span></span>";
+  nav.appendChild(btn);
+
+  var navLinks = document.querySelector(".nav-links");
+  var links    = navLinks ? navLinks.querySelectorAll("a") : [];
+
+  var menu = document.createElement("div");
+  menu.className = "mobile-menu";
+  menu.id        = "mobileMenu";
+
+  links.forEach(function(a) {
+    var link = document.createElement("a");
+    link.href        = a.getAttribute("href");
+    link.textContent = a.textContent.trim();
+    if (a.getAttribute("href") === page || a.classList.contains("active")) {
+      link.classList.add("active");
+    }
+    menu.appendChild(link);
+  });
+
+  var divider = document.createElement("div");
+  divider.className = "mobile-menu-divider";
+  menu.appendChild(divider);
+
+  if (user) {
+    var planLabels = {free:"FREE", premium:"PREMIUM", pro:"PRO"};
+    var userInfo   = document.createElement("div");
+    userInfo.className = "mobile-menu-user";
+    userInfo.innerHTML = "<span>" + maskEmail(user.email) + "</span>"
+      + "<span style=\"color:var(--accent);font-weight:700;font-size:0.78rem;\">"
+      + (planLabels[user.plan] || "FREE") + "</span>";
+    menu.appendChild(userInfo);
+
+    var logoutLink = document.createElement("a");
+    logoutLink.href = "#";
+    logoutLink.textContent = "\uD83D\uDEAA D\u00e9connexion";
+    logoutLink.onclick = function(e) { e.preventDefault(); logout(); };
+    menu.appendChild(logoutLink);
+  } else {
+    var loginLink = document.createElement("a");
+    loginLink.href        = "login.html";
+    loginLink.textContent = "\uD83D\uDD10 Connexion";
+    menu.appendChild(loginLink);
+  }
+
+  document.body.appendChild(menu);
+
+  btn.addEventListener("click", function(e) {
+    e.stopPropagation();
+    var isOpen = menu.classList.toggle("open");
+    btn.classList.toggle("open", isOpen);
+  });
+
+  document.addEventListener("click", function(e) {
+    if (!menu.contains(e.target) && e.target !== btn) {
+      menu.classList.remove("open");
+      btn.classList.remove("open");
+    }
+  });
+
+  menu.querySelectorAll("a").forEach(function(a) {
+    a.addEventListener("click", function() {
+      menu.classList.remove("open");
+      btn.classList.remove("open");
+    });
   });
 }
 
