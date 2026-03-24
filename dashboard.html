@@ -153,7 +153,7 @@
             <span class="quick-btn-icon">📰</span>
             <div>
               <div class="quick-btn-text">Analyse Fondamentale</div>
-              <div class="quick-btn-sub">Actualités du marché · Pro</div>
+              <div class="quick-btn-sub" id="fundLinkSub">Actualités du marché</div>
             </div>
           </a>
           <div class="quick-btn" onclick="openUpgradeModal()" id="upgradeQuick" style="display:none;">
@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("statLeftSub").textContent = plan === "pro" ? "Illimité" : "restantes ce mois";
   var planLabels = {free:"Gratuit", premium:"Premium", pro:"Pro"};
   document.getElementById("statPlan").textContent = planLabels[plan] || "Free";
-  document.getElementById("statPlanSub").textContent = plan === "free" ? "2 analyses à vie" : plan === "premium" ? "50 analyses/mois" : "Analyses illimitées";
+  document.getElementById("statPlanSub").textContent = plan === "free" ? "2 analyses graphiques" : plan === "premium" ? "50 analyses/mois" : "Analyses illimitées";
 
   // Quota bar
   var pct = plan === "pro" ? 30 : Math.min(100, (q.used / q.limit) * 100);
@@ -230,11 +230,16 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("quotaFillDash").style.background = pct >= 90 ? "var(--danger)" : pct >= 60 ? "var(--warning)" : "var(--accent)";
   document.getElementById("quotaMaxDash").textContent = planLabels[plan];
 
+  // Lien fondamental — sous-titre selon le plan
+  var fundSubs = {free:"1 analyse/mois incluse", premium:"20 analyses/mois", pro:"Illimité"};
+  var fundSubEl = document.getElementById("fundLinkSub");
+  if (fundSubEl) fundSubEl.textContent = fundSubs[plan] || "Actualités du marché";
+
   // Plan features
   var featuresByPlan = {
-    free:    ["2 analyses à vie", "MytAI Fast"],
-    premium: ["50 analyses/mois", "MytAI Fast", "MytAI Pro", "MytAI Vision", "Renouvellement mensuel"],
-    pro:     ["Analyses illimitées", "MytAI Fast, Pro, Vision, Expert", "Analyse Fondamentale", "Accès prioritaire aux nouveautés"]
+    free:    ["2 analyses graphiques à vie", "MytAI Fast", "1 analyse fondamentale/mois"],
+    premium: ["50 analyses graphiques/mois", "MytAI Fast, Pro, Vision", "20 analyses fondamentales/mois", "Renouvellement mensuel"],
+    pro:     ["Analyses graphiques illimitées", "MytAI Fast, Pro, Vision, Expert", "Analyses fondamentales illimitées", "Accès prioritaire aux nouveautés"]
   };
   var features = featuresByPlan[plan] || featuresByPlan.free;
   var ul = document.getElementById("planFeatures");
