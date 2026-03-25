@@ -76,6 +76,15 @@
 <div class="analyse-page">
   <div class="container">
 
+    <!-- Bandeau bienvenue nouvel utilisateur -->
+    <div id="welcomeBanner" style="display:none;background:linear-gradient(135deg,#38bdf815,#7c3aed15);border:1px solid #38bdf833;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div>
+        <div style="font-weight:700;color:white;margin-bottom:4px;">🎉 Bienvenue sur MyTradingX !</div>
+        <div style="font-size:0.85rem;color:#94a3b8;">Tu as <strong style="color:#38bdf8;">5 analyses gratuites</strong> à utiliser ce mois-ci. Upload ton premier graphique et lance l'analyse !</div>
+      </div>
+      <button onclick="document.getElementById('welcomeBanner').style.display='none'" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:1.2rem;padding:4px;">✕</button>
+    </div>
+
     <div style="margin-bottom:24px;">
       <div class="section-label">MytAI</div>
       <h1>Analyse Graphique IA</h1>
@@ -178,6 +187,24 @@
   </div>
 </div>
 
+<!-- ── Nudge upgrade post-analyse ── -->
+<div id="upgradeNudge" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:1000;background:#0f1a2e;border:1px solid #38bdf833;border-radius:14px;padding:16px 20px;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:480px;width:calc(100% - 32px);align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+  <div>
+    <div style="font-weight:700;color:white;font-size:0.95rem;margin-bottom:3px;">⚡ Ton analyse est prête !</div>
+    <div style="font-size:0.8rem;color:#94a3b8;">Passe au plan <strong style="color:#a78bfa;">Premium</strong> pour 50 analyses/mois et des moteurs plus puissants.</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn btn-pro btn-sm" onclick="closeUpgradeModal(); openUpgradeModal();" style="white-space:nowrap;">Voir les offres</button>
+    <button onclick="document.getElementById('upgradeNudge').style.display='none'" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:1.1rem;">✕</button>
+  </div>
+</div>
+<style>
+@keyframes nudgeFadeIn {
+  from { opacity:0; transform:translateX(-50%) translateY(16px); }
+  to   { opacity:1; transform:translateX(-50%) translateY(0); }
+}
+</style>
+
 <!-- ── Upgrade Modal ── -->
 <div id="upgradeModal" class="modal-overlay">
   <div class="modal-box" style="max-width:560px;">
@@ -212,7 +239,7 @@
 <div id="authModal" class="modal-overlay">
   <div class="modal-box" style="max-width:420px;">
     <h2>Connecte-toi pour continuer</h2>
-    <p style="margin-bottom:20px;font-size:0.88rem;">Crée un compte gratuit et reçois 2 analyses offertes.</p>
+    <p style="margin-bottom:20px;font-size:0.88rem;">Crée un compte gratuit — 5 analyses offertes, sans carte bancaire.</p>
     <div class="auth-tabs">
       <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Se connecter</button>
       <button class="auth-tab" id="authTabRegister" onclick="switchAuthTab('register')">S'inscrire</button>
@@ -238,6 +265,14 @@ document.addEventListener("DOMContentLoaded", function() {
     updateQuota();
   }
   initDropZones();
+
+  // Afficher le bandeau de bienvenue si nouvel utilisateur
+  var params = new URLSearchParams(window.location.search);
+  if (params.get("welcome") === "1") {
+    var banner = document.getElementById("welcomeBanner");
+    if (banner) banner.style.display = "flex";
+    window.history.replaceState({}, "", window.location.pathname);
+  }
 });
 
 function updateModelSelector() {
@@ -475,6 +510,26 @@ function renderResult(data, savedId) {
     + '<div class="result-section"><div class="result-label">Analyse complète</div>' + (data.explication||"") + '</div>'
     + feedbackHtml
     + '</div>';
+
+  // Nudge upgrade : afficher 3s après la 1ère analyse si plan free
+  var _user = getUser();
+  if (_user && _user.plan === "free") {
+    var _used = _user.analyses_utilisees || 0;
+    if (_used === 1) {
+      setTimeout(function() {
+        var nudge = document.getElementById("upgradeNudge");
+        if (nudge) {
+          nudge.style.display = "flex";
+          nudge.style.animation = "nudgeFadeIn 0.4s ease";
+        }
+      }, 2500);
+    }
+    // Quand il ne reste qu'1 analyse
+    if (_used >= 4) {
+      var nudge = document.getElementById("upgradeNudge");
+      if (nudge) nudge.style.display = "flex";
+    }
+  }
 }
 
 function setTradeResult(val) {
