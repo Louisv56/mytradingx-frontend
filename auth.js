@@ -212,13 +212,19 @@ async function doAuth() {
     if (_authMode === "register") {
       if (msg) msg.textContent = "Inscription réussie ! Connexion...";
       _authMode = "login";
+      localStorage.setItem("newUser", "1");
       setTimeout(doAuth, 800);
       return;
     }
     var user = Object.assign({}, data.user, {password});
     saveUser(user);
-    // Redirect to dashboard
-    window.location.href = "dashboard.html";
+    // Nouveaux utilisateurs -> analyse avec message de bienvenue, sinon dashboard
+    if (localStorage.getItem("newUser")) {
+      localStorage.removeItem("newUser");
+      window.location.href = "analyse.html?welcome=1";
+    } else {
+      window.location.href = "dashboard.html";
+    }
   } catch(e) {
     if (msg) msg.textContent = "Erreur réseau.";
   }
@@ -298,7 +304,7 @@ function checkPaymentReturn() {
 function getQuota(user) {
   var plan  = user.plan;
   var used  = user.analyses_utilisees || 0;
-  var limit = plan === "free" ? 2 : plan === "premium" ? 50 : Infinity;
+  var limit = plan === "free" ? 5 : plan === "premium" ? 50 : Infinity;
   var left  = plan === "pro" ? 999 : Math.max(0, limit - used);
   return {plan, used, limit, left};
 }
