@@ -218,11 +218,12 @@ async function doAuth() {
     }
     var user = Object.assign({}, data.user, {password});
     saveUser(user);
-    // Nouveaux utilisateurs -> analyse avec message de bienvenue, sinon dashboard
-    if (localStorage.getItem("newUser")) {
+    // Message de bienvenue uniquement pour les nouveaux utilisateurs FREE
+    if (localStorage.getItem("newUser") && data.user.plan === "free") {
       localStorage.removeItem("newUser");
       window.location.href = "analyse.html?welcome=1";
     } else {
+      localStorage.removeItem("newUser");
       window.location.href = "dashboard.html";
     }
   } catch(e) {
