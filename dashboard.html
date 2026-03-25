@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("statLeftSub").textContent = plan === "pro" ? "Illimité" : "restantes ce mois";
   var planLabels = {free:"Gratuit", premium:"Premium", pro:"Pro"};
   document.getElementById("statPlan").textContent = planLabels[plan] || "Free";
-  document.getElementById("statPlanSub").textContent = plan === "free" ? "2 analyses graphiques" : plan === "premium" ? "50 analyses/mois" : "Analyses illimitées";
+  document.getElementById("statPlanSub").textContent = plan === "free" ? "5 analyses graphiques" : plan === "premium" ? "50 analyses/mois" : "Analyses illimitées";
 
   // Quota bar
   var pct = plan === "pro" ? 30 : Math.min(100, (q.used / q.limit) * 100);
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Plan features
   var featuresByPlan = {
-    free:    ["2 analyses graphiques à vie", "MytAI Fast", "1 analyse fondamentale/mois"],
+    free:    ["5 analyses graphiques à vie", "MytAI Fast", "1 analyse fondamentale/mois"],
     premium: ["50 analyses graphiques/mois", "MytAI Fast, Pro, Vision", "20 analyses fondamentales/mois", "Renouvellement mensuel"],
     pro:     ["Analyses graphiques illimitées", "MytAI Fast, Pro, Vision, Expert", "Analyses fondamentales illimitées", "Accès prioritaire aux nouveautés"]
   };
