@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>html{background:#080c14}</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarifs — MyTradingX</title>
+<meta name="description" content="Découvrez les plans MyTradingX : Free, Premium et Pro. Analysez vos graphiques de trading avec l'IA MytAI. 5 analyses gratuites à l'inscription, sans carte bancaire.">
+<meta name="keywords" content="tarifs mytradingx, prix analyse trading IA, abonnement premium pro, plans mytradingx">
+<meta name="author" content="MyTradingX">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MyTradingX">
+<meta property="og:title" content="Tarifs MyTradingX — Plans Free, Premium & Pro">
+<meta property="og:description" content="Choisissez votre plan MyTradingX. 5 analyses gratuites à l'inscription, sans carte bancaire.">
+<meta property="og:url" content="https://mytradingx.fr/tarifs.html">
+<meta property="og:image" content="https://mytradingx.fr/faviconmtx.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tarifs MyTradingX — Plans Free, Premium & Pro">
+<meta name="twitter:description" content="Choisissez votre plan MyTradingX. 5 analyses gratuites à l'inscription, sans carte bancaire.">
+<link rel="icon" type="image/png" href="faviconmtx.png">
+<link rel="stylesheet" href="style.css">
+
+<style>
+/* ── Page layout ── */
+.tarifs-page {
+  padding: 100px 0 80px;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, #38bdf812 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 80% 60%, #7c3aed08 0%, transparent 50%);
+}
+
+/* ── Hero header ── */
+.tarifs-hero {
+  text-align: center;
+  margin-bottom: 60px;
+}
+.tarifs-hero .section-label {
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.tarifs-hero h1 {
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tarifs-hero p {
+  font-size: 1.05rem;
+  max-width: 500px;
+  margin: 0 auto 24px;
+  color: var(--muted2);
+}
+.launch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #7c3aed18;
+  border: 1px solid #7c3aed44;
+  border-radius: 30px;
+  padding: 8px 18px;
+  font-size: 0.82rem;
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+/* ── Plans grid ── */
+.plans-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 960px;
+  margin: 0 auto 60px;
+  align-items: start;
+}
+
+/* ── Plan card ── */
+.plan-big-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+.plan-big-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.plan-big-card.popular {
+  border-color: #7c3aed55;
+  background: linear-gradient(160deg, #0f1a2e 0%, #130d22 100%);
+  transform: translateY(-8px);
+  box-shadow: 0 24px 60px rgba(124, 58, 237, 0.15);
+}
+.plan-big-card.popular:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 32px 80px rgba(124, 58, 237, 0.25);
+}
+
+/* Badge populaire */
+.popular-badge {
+  display: none;
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: 20px;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.plan-big-card.popular .popular-badge { display: block; }
+
+/* Plan header */
+.plan-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.plan-big-card.popular .plan-name { color: #a78bfa; }
+
+.plan-tagline {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+/* Pricing */
+.plan-pricing {
+  margin-bottom: 24px;
+}
+.plan-old-price {
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-decoration: line-through;
+  margin-bottom: 2px;
+}
+.plan-price {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.plan-price .amount {
+  font-size: 3rem;
+}
+.plan-price .currency {
+  font-size: 1.2rem;
+  color: var(--muted2);
+  align-self: flex-start;
+  margin-top: 6px;
+}
+.plan-price .period {
+  font-size: 0.85rem;
+  color: var(--muted2);
+  font-weight: 400;
+}
+.plan-big-card:not(.popular) .plan-price .amount { color: var(--accent); }
+.plan-big-card.popular .plan-price .amount { color: #a78bfa; }
+.plan-big-card:first-child .plan-price .amount { color: var(--text); }
+
+.plan-economy-tag {
+  display: inline-block;
+  background: #22c55e18;
+  color: var(--accent3);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  margin-top: 6px;
+}
+
+/* Divider */
+.plan-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 20px 0;
+}
+
+/* Features list */
+.plan-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  flex: 1;
+}
+.plan-features-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 0.875rem;
+  color: var(--muted2);
+  border-bottom: 1px solid #1e2d4540;
+}
+.plan-features-list li:last-child { border-bottom: none; }
+.feat-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.feat-icon.yes {
+  background: #22c55e20;
+  color: var(--accent3);
+}
+.feat-icon.no {
+  background: #ef444420;
+  color: var(--danger);
+}
+.feat-highlight {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* CTA Button */
+.plan-cta { margin-top: auto; }
+
+/* ── Comparison table ── */
+.comparison-section {
+  max-width: 860px;
+  margin: 0 auto 60px;
+}
+.comparison-section h2 {
+  text-align: center;
+  margin-bottom: 28px;
+  font-size: 1.4rem;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.comparison-table thead th {
+  padding: 14px 16px;
+  text-align: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted2);
+}
+.comparison-table thead th:first-child {
+  text-align: left;
+  color: var(--muted);
+  font-weight: 500;
+}
+.comparison-table thead th.col-free { color: var(--muted2); }
+.comparison-table thead th.col-premium { color: var(--accent); }
+.comparison-table thead th.col-pro { color: #a78bfa; }
+
+.comparison-table tbody tr {
+  border-bottom: 1px solid #1e2d4540;
+  transition: background 0.15s;
+}
+.comparison-table tbody tr:hover { background: #38bdf805; }
+.comparison-table tbody tr.section-row td {
+  padding: 20px 16px 8px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  font-weight: 600;
+  border-bottom: none;
+}
+.comparison-table tbody td {
+  padding: 12px 16px;
+  text-align: center;
+  color: var(--muted2);
+}
+.comparison-table tbody td:first-child {
+  text-align: left;
+  color: var(--text);
+  font-weight: 500;
+}
+.check { color: var(--accent3); font-size: 1rem; }
+.check-pro { color: #a78bfa; font-size: 1rem; }
+.cross { color: var(--border2); font-size: 0.9rem; }
+.val-free { color: var(--muted2); }
+.val-premium { color: var(--accent); font-weight: 600; }
+.val-pro { color: #a78bfa; font-weight: 600; }
+
+/* ── FAQ ── */
+.faq-section {
+  max-width: 680px;
+  margin: 0 auto 60px;
+}
+.faq-section h2 {
+  text-align: center;
+  margin-bottom: 28px;
+  font-size: 1.4rem;
+}
+.faq-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.faq-question {
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: color 0.2s;
+  user-select: none;
+}
+.faq-question:hover { color: var(--accent); }
+.faq-arrow {
+  color: var(--muted);
+  font-size: 0.75rem;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+.faq-item.open .faq-arrow { transform: rotate(180deg); color: var(--accent); }
+.faq-answer {
+  display: none;
+  padding: 0 20px 16px;
+  font-size: 0.875rem;
+  color: var(--muted2);
+  line-height: 1.7;
+  border-top: 1px solid var(--border);
+}
+.faq-item.open .faq-answer { display: block; }
+
+/* ── Bottom CTA ── */
+.bottom-cta {
+  text-align: center;
+  background: linear-gradient(135deg, #7c3aed10, #38bdf810);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 48px 32px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.bottom-cta h2 { margin-bottom: 12px; font-size: 1.6rem; }
+.bottom-cta p  { margin-bottom: 28px; font-size: 0.95rem; }
+.bottom-cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .plans-container { grid-template-columns: 1fr; max-width: 420px; }
+  .plan-big-card.popular { transform: none; }
+  .plan-big-card.popular:hover { transform: translateY(-4px); }
+  .comparison-section { overflow-x: auto; }
+  .comparison-table { min-width: 520px; }
+}
+@media (max-width: 600px) {
+  .tarifs-page { padding: 90px 0 60px; }
+  .bottom-cta { padding: 32px 20px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">MyTrading<span>X</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="analyse.html">Analyse</a>
+    <a href="historique.html">Historique</a>
+    <a href="fondamental.html">Fondamental</a>
+    <a href="tarifs.html" class="active">Tarifs</a>
+    <a href="blog.html">Blog</a>
+  </div>
+  <div class="nav-right">
+    <span id="navUser" class="nav-user hidden"></span>
+    <span id="navPlan" class="nav-plan hidden"></span>
+    <a href="login.html" id="navLogin" class="btn btn-outline btn-sm hidden">Connexion</a>
+    <button onclick="logout()" id="navLogout" class="btn btn-secondary btn-sm hidden">Déconnexion</button>
+  </div>
+</nav>
+
+<div class="tarifs-page">
+  <div class="container">
+
+    <!-- ── Hero ── -->
+    <div class="tarifs-hero">
+      <div class="section-label">💰 Tarifs</div>
+      <h1>Choisissez votre plan</h1>
+      <p>Commencez gratuitement, passez au niveau supérieur quand vous êtes prêt.</p>
+      <div class="launch-badge">
+        🎉 Prix de lancement — Offre limitée aux 50 premiers abonnés
+      </div>
+    </div>
+
+    <!-- ── Plans cards ── -->
+    <div class="plans-container">
+
+      <!-- FREE -->
+      <div class="plan-big-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-tagline">Pour découvrir MytAI</div>
+        <div class="plan-pricing">
+          <div class="plan-price">
+            <span class="amount">0</span>
+            <span class="currency">€</span>
+            <span class="period">/ à vie</span>
+          </div>
+        </div>
+        <hr class="plan-divider">
+        <ul class="plan-features-list">
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span><span class="feat-highlight">5 analyses graphiques</span> offertes</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Moteur <span class="feat-highlight">MytAI Fast</span> (GPT-4o mini)</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span><span class="feat-highlight">1 analyse fondamentale</span>/mois</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Historique des analyses</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Setup SMC complet (OB, FVG, BOS…)</span>
+          </li>
+          <li>
+            <span class="feat-icon no">✗</span>
+            <span style="color:var(--muted);">Moteurs MytAI Pro / Vision / Expert</span>
+          </li>
+          <li>
+            <span class="feat-icon no">✗</span>
+            <span style="color:var(--muted);">Multi-timeframe avancé</span>
+          </li>
+        </ul>
+        <div class="plan-cta">
+          <a href="login.html?tab=register" class="btn btn-secondary btn-full" id="ctaFree">Commencer gratuitement</a>
+        </div>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="plan-big-card popular">
+        <div class="popular-badge">⭐ Le plus populaire</div>
+        <div class="plan-name">Premium</div>
+        <div class="plan-tagline">Pour les traders actifs</div>
+        <div class="plan-pricing">
+          <div class="plan-old-price">19 €/mois</div>
+          <div class="plan-price">
+            <span class="amount">9</span>
+            <span class="currency">€</span>
+            <span class="period">/ mois</span>
+          </div>
+          <div class="plan-economy-tag">Économisez 10 €/mois</div>
+        </div>
+        <hr class="plan-divider">
+        <ul class="plan-features-list">
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span><span class="feat-highlight">50 analyses graphiques</span>/mois</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Moteur <span class="feat-highlight">MytAI Fast</span> (GPT-4o mini)</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Moteur <span class="feat-highlight">MytAI Pro</span> (GPT-4o)</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Moteur <span class="feat-highlight">MytAI Vision</span> (Gemini)</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span><span class="feat-highlight">20 analyses fondamentales</span>/mois</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Historique & suivi des trades</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Renouvellement mensuel automatique</span>
+          </li>
+          <li>
+            <span class="feat-icon no">✗</span>
+            <span style="color:var(--muted);">Moteur MytAI Expert (Claude)</span>
+          </li>
+        </ul>
+        <div class="plan-cta">
+          <button class="btn btn-pro btn-full" id="ctaPremium" onclick="subscribePlan('premium')">Choisir Premium</button>
+        </div>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-big-card">
+        <div class="plan-name" style="color:#a78bfa;">Pro</div>
+        <div class="plan-tagline">Pour les pros du trading</div>
+        <div class="plan-pricing">
+          <div class="plan-old-price">39 €/mois</div>
+          <div class="plan-price">
+            <span class="amount" style="color:#a78bfa;">19</span>
+            <span class="currency">€</span>
+            <span class="period">/ mois</span>
+          </div>
+          <div class="plan-economy-tag">Économisez 20 €/mois</div>
+        </div>
+        <hr class="plan-divider">
+        <ul class="plan-features-list">
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span><span class="feat-highlight">Analyses graphiques illimitées</span></span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Moteur <span class="feat-highlight">MytAI Fast</span> (GPT-4o mini)</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Moteur <span class="feat-highlight">MytAI Pro</span> (GPT-4o)</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Moteur <span class="feat-highlight">MytAI Vision</span> (Gemini)</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Moteur <span class="feat-highlight">MytAI Expert</span> (Claude) ✨</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span><span class="feat-highlight">Analyses fondamentales illimitées</span></span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Analyse Multi-timeframe HTF + LTF</span>
+          </li>
+          <li>
+            <span class="feat-icon yes">✓</span>
+            <span>Accès prioritaire aux nouveautés</span>
+          </li>
+        </ul>
+        <div class="plan-cta">
+          <button class="btn btn-outline btn-full" id="ctaPro" onclick="subscribePlan('pro')" style="border-color:#7c3aed66;color:#a78bfa;">Choisir Pro</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Comparison table ── -->
+    <div class="comparison-section">
+      <h2>Comparaison détaillée</h2>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="col-free">Free</th>
+            <th class="col-premium">Premium</th>
+            <th class="col-pro">Pro</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="section-row"><td colspan="4">📊 Analyses graphiques</td></tr>
+          <tr>
+            <td>Analyses / mois</td>
+            <td class="val-free">5 à vie</td>
+            <td class="val-premium">50 / mois</td>
+            <td class="val-pro">Illimité</td>
+          </tr>
+          <tr>
+            <td>Setup SMC complet (OB, FVG, BOS…)</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Entrée, Stop Loss, Take Profit</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Probabilité de succès</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Analyse Multi-timeframe (HTF + LTF)</td>
+            <td><span class="cross">—</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+
+          <tr class="section-row"><td colspan="4">🤖 Moteurs MytAI</td></tr>
+          <tr>
+            <td>MytAI Fast (GPT-4o mini)</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>MytAI Pro (GPT-4o)</td>
+            <td><span class="cross">—</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>MytAI Vision (Gemini 2.5)</td>
+            <td><span class="cross">—</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>MytAI Expert (Claude) ✨</td>
+            <td><span class="cross">—</span></td>
+            <td><span class="cross">—</span></td>
+            <td><span class="check-pro">✓</span></td>
+          </tr>
+
+          <tr class="section-row"><td colspan="4">📰 Analyse fondamentale</td></tr>
+          <tr>
+            <td>Analyses fondamentales / mois</td>
+            <td class="val-free">1 / mois</td>
+            <td class="val-premium">20 / mois</td>
+            <td class="val-pro">Illimité</td>
+          </tr>
+          <tr>
+            <td>Sentiment de marché IA</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>News en temps réel (Finnhub)</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+
+          <tr class="section-row"><td colspan="4">📁 Historique & suivi</td></tr>
+          <tr>
+            <td>Historique des analyses</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Suivi win / loss / skip</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Notes sur les trades</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+
+          <tr class="section-row"><td colspan="4">⚙️ Général</td></tr>
+          <tr>
+            <td>Sans engagement</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Résiliable à tout moment</td>
+            <td>—</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Accès prioritaire aux nouveautés</td>
+            <td><span class="cross">—</span></td>
+            <td><span class="cross">—</span></td>
+            <td><span class="check-pro">✓</span></td>
+          </tr>
+
+          <tr>
+            <td style="padding-top:20px;"><strong>Prix</strong></td>
+            <td class="val-free" style="padding-top:20px;font-size:1.05rem;font-weight:700;">0 €</td>
+            <td class="val-premium" style="padding-top:20px;font-size:1.05rem;font-weight:700;">9 €/mois</td>
+            <td class="val-pro" style="padding-top:20px;font-size:1.05rem;font-weight:700;">19 €/mois</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── FAQ ── -->
+    <div class="faq-section">
+      <h2>Questions fréquentes</h2>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Les 5 analyses gratuites expirent-elles ?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          Non, les 5 analyses offertes à l'inscription ne expirent jamais. Tu peux les utiliser quand tu veux, sans limite de temps. Aucune carte bancaire n'est requise pour créer ton compte Free.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Puis-je changer de plan ou résilier à tout moment ?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          Oui, sans engagement. Tu peux résilier ton abonnement à tout moment depuis ton Dashboard. Ton accès reste actif jusqu'à la fin de la période déjà payée.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Qu'est-ce que MytAI Expert (Claude) ?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          MytAI Expert est notre moteur le plus puissant, basé sur Claude d'Anthropic. Il offre des analyses plus détaillées, une meilleure compréhension des contextes complexes et des explications plus approfondies des setups SMC. Disponible uniquement dans le plan Pro.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Les analyses sont-elles des conseils financiers ?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          Non. Les analyses fournies par MyTradingX sont générées par une IA à partir de vos graphiques et sont fournies à titre éducatif et informatif uniquement. Elles ne constituent pas des conseils en investissement. Le trading comporte des risques — tradez toujours de manière responsable.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Le quota d'analyses se renouvelle quand ?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          Pour les plans Premium et Pro, le compteur d'analyses est réinitialisé automatiquement chaque mois à la date anniversaire de votre abonnement. Les analyses non utilisées ne sont pas reportées au mois suivant.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Quels moyens de paiement sont acceptés ?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          Les paiements sont sécurisés via Stripe. Nous acceptons toutes les cartes bancaires (Visa, Mastercard, American Express), ainsi qu'Apple Pay et Google Pay selon votre navigateur.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Bottom CTA ── -->
+    <div class="bottom-cta">
+      <h2>Prêt à trader plus intelligemment ?</h2>
+      <p>Rejoins des centaines de traders qui utilisent déjà MytAI pour analyser leurs graphiques.</p>
+      <div class="bottom-cta-btns">
+        <a href="login.html?tab=register" class="btn btn-primary btn-lg">Commencer gratuitement</a>
+        <a href="analyse.html" class="btn btn-secondary btn-lg">Voir une démo</a>
+      </div>
+      <p style="font-size:0.75rem;margin-top:16px;color:var(--muted);">Sans carte bancaire · 5 analyses offertes · Sans engagement</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Upgrade Modal (si déjà connecté) ── -->
+<div id="upgradeModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:560px;">
+    <h2>Passez à la version supérieure</h2>
+    <div style="background:#7c3aed15;border:1px solid #7c3aed33;border-radius:8px;padding:8px 14px;margin:12px 0;font-size:0.82em;color:#a78bfa;">
+      🎉 <strong>Prix de lancement</strong> — Offre limitée aux 50 premiers abonnés
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div style="font-weight:700;margin-bottom:4px;">Premium</div>
+        <div class="plan-price-old">19€/mois</div>
+        <div class="price" style="font-family:'Syne',sans-serif;font-size:1.8em;font-weight:800;color:var(--accent);">9€<span style="font-size:0.5em;color:var(--muted2);">/mois</span></div>
+        <div class="plan-economy">Économisez 10€/mois</div>
+        <ul><li>50 analyses/mois</li><li>MytAI Fast, Pro, Vision</li></ul>
+        <button class="btn btn-outline btn-full" onclick="subscribe('premium')">Choisir Premium</button>
+      </div>
+      <div class="plan-card popular">
+        <div style="font-weight:700;margin-bottom:4px;color:#a78bfa;">⭐ Pro</div>
+        <div class="plan-price-old">39€/mois</div>
+        <div class="price" style="font-family:'Syne',sans-serif;font-size:1.8em;font-weight:800;color:#a78bfa;">19€<span style="font-size:0.5em;color:var(--muted2);">/mois</span></div>
+        <div class="plan-economy">Économisez 20€/mois</div>
+        <ul><li>Analyses illimitées</li><li>MytAI Fast, Pro, Vision, Expert</li><li>Analyse Fondamentale</li></ul>
+        <button class="btn btn-pro btn-full" onclick="subscribe('pro')">Choisir Pro</button>
+      </div>
+    </div>
+    <p style="font-size:0.72em;color:var(--muted);text-align:center;margin-top:8px;">Sans engagement · Résiliable à tout moment</p>
+    <button class="btn btn-secondary btn-full mt-4" onclick="closeUpgradeModal()">Fermer</button>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  initNav();
+  checkPaymentReturn();
+
+  var user = getUser();
+
+  // Adapter les boutons selon l'état de connexion et le plan actuel
+  if (user) {
+    var plan = user.plan;
+
+    // Bouton Free → vers dashboard si déjà connecté
+    var ctaFree = document.getElementById("ctaFree");
+    if (ctaFree) {
+      ctaFree.textContent = "Mon compte";
+      ctaFree.href = "dashboard.html";
+    }
+
+    // Boutons Premium / Pro
+    var ctaPremium = document.getElementById("ctaPremium");
+    var ctaPro     = document.getElementById("ctaPro");
+
+    if (plan === "premium") {
+      if (ctaPremium) { ctaPremium.textContent = "✓ Plan actuel"; ctaPremium.disabled = true; ctaPremium.style.opacity = "0.5"; ctaPremium.style.cursor = "not-allowed"; }
+    }
+    if (plan === "pro") {
+      if (ctaPro) { ctaPro.textContent = "✓ Plan actuel"; ctaPro.disabled = true; ctaPro.style.opacity = "0.5"; ctaPro.style.cursor = "not-allowed"; }
+      if (ctaPremium) { ctaPremium.textContent = "Déjà Pro"; ctaPremium.disabled = true; ctaPremium.style.opacity = "0.4"; ctaPremium.style.cursor = "not-allowed"; }
+    }
+  }
+});
+
+function subscribePlan(plan) {
+  var user = getUser();
+  if (!user) {
+    window.location.href = "login.html?tab=register";
+    return;
+  }
+  subscribe(plan);
+}
+
+function toggleFaq(questionEl) {
+  var item = questionEl.closest(".faq-item");
+  // Fermer les autres
+  document.querySelectorAll(".faq-item.open").forEach(function(el) {
+    if (el !== item) el.classList.remove("open");
+  });
+  item.classList.toggle("open");
+}
+</script>
+</body>
+</html>
