@@ -82,7 +82,7 @@
         <div style="font-weight:700;color:white;margin-bottom:4px;">🎉 Bienvenue sur MyTradingX !</div>
         <div style="font-size:0.85rem;color:#94a3b8;">Tu as <strong style="color:#38bdf8;">5 analyses graphiques gratuites</strong> à utiliser. Upload ton premier graphique et lance l'analyse !</div>
       </div>
-      <button onclick="document.getElementById('welcomeBanner').style.display='none'" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:1.2rem;padding:4px;">✕</button>
+      <button onclick="closeWelcomeBanner()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:1.2rem;padding:4px;">✕</button>
     </div>
 
     <div style="margin-bottom:24px;">
@@ -256,6 +256,13 @@
 <script>
 var selectedModel = "gpt-4o-mini";
 
+function closeWelcomeBanner() {
+  document.getElementById("welcomeBanner").style.display = "none";
+  var now = new Date();
+  var thisMonth = now.getFullYear() + "-" + (now.getMonth() + 1);
+  localStorage.setItem("welcomeDismissedMonth", thisMonth);
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   initNav();
   checkPaymentReturn();
@@ -269,18 +276,19 @@ document.addEventListener("DOMContentLoaded", function() {
   // ── Bandeau bienvenue : Free uniquement, 1 fois par mois ──
   (function() {
     var user = getUser();
-    if (!user || user.plan !== "free") return; // Jamais pour Premium/Pro
+    if (!user || user.plan !== "free") return;
 
     var now       = new Date();
     var thisMonth = now.getFullYear() + "-" + (now.getMonth() + 1);
     var lastShown = localStorage.getItem("welcomeShownMonth");
+    var dismissed = localStorage.getItem("welcomeDismissedMonth");
 
-    // Afficher si : nouveau mois OU première visite (?welcome=1)
     var params      = new URLSearchParams(window.location.search);
     var isNewSignup = params.get("welcome") === "1";
     window.history.replaceState({}, "", window.location.pathname);
 
-    if (lastShown !== thisMonth || isNewSignup) {
+    // Afficher si nouveau mois ET pas encore fermé ce mois
+    if ((lastShown !== thisMonth || isNewSignup) && dismissed !== thisMonth) {
       var banner = document.getElementById("welcomeBanner");
       if (banner) banner.style.display = "flex";
       localStorage.setItem("welcomeShownMonth", thisMonth);
