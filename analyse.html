@@ -33,6 +33,8 @@
 }
 .btn-multitf:hover { border-color: var(--accent); color: var(--accent); }
 .btn-multitf.active { border-color: var(--accent); color: var(--accent); background: #38bdf810; }
+.btn-multitf.locked-multitf { border-color: #7c3aed33; color: var(--muted); cursor: not-allowed; }
+.btn-multitf.locked-multitf:hover { border-color: #7c3aed66; color: #a78bfa; background: #7c3aed08; }
 .multitf-zone { display: none; }
 .multitf-zone.open { display: block; }
 .btn-result {
@@ -64,7 +66,6 @@
     <a href="historique.html">Historique</a>
     <a href="fondamental.html">Fondamental</a>
     <a href="blog.html">Blog</a>
-    <a href="tarifs.html">Tarifs</a>
   </div>
   <div class="nav-right">
     <span id="navUser" class="nav-user hidden"></span>
@@ -155,6 +156,7 @@
           <!-- Bouton multi-timeframe -->
           <button class="btn-multitf" id="btnMultiTF" onclick="toggleMultiTF()">
             <span id="multitfIcon">＋</span> Ajouter un 2ème graphique (Multi-timeframe)
+            <span id="multitfLockBadge" style="display:none;margin-left:auto;background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44;border-radius:6px;font-size:0.7rem;font-weight:700;padding:2px 7px;">Premium+</span>
           </button>
 
           <!-- Zone LTF cachée par défaut -->
@@ -271,6 +273,13 @@ document.addEventListener("DOMContentLoaded", function() {
   if (user) {
     updateModelSelector();
     updateQuota();
+    // Afficher le badge verrou si plan Free
+    if (user.plan === "free") {
+      var badge = document.getElementById("multitfLockBadge");
+      var btn   = document.getElementById("btnMultiTF");
+      if (badge) badge.style.display = "inline-block";
+      if (btn)   btn.classList.add("locked-multitf");
+    }
   }
   initDropZones();
 
@@ -346,6 +355,15 @@ function updateQuota() {
 }
 
 function toggleMultiTF() {
+  var user = getUser();
+  if (!user) { openAuthModal(); return; }
+
+  // Bloquer les utilisateurs Free
+  if (user.plan === "free") {
+    openUpgradeModal();
+    return;
+  }
+
   var zone = document.getElementById("multitfZone");
   var btn  = document.getElementById("btnMultiTF");
   var icon = document.getElementById("multitfIcon");
