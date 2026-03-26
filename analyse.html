@@ -266,22 +266,26 @@ document.addEventListener("DOMContentLoaded", function() {
   }
   initDropZones();
 
-  // Afficher le bandeau de bienvenue : Free uniquement, 1 fois par mois
-  var params = new URLSearchParams(window.location.search);
-  if (params.get("welcome") === "1") {
+  // ── Bandeau bienvenue : Free uniquement, 1 fois par mois ──
+  (function() {
     var user = getUser();
-    if (user && user.plan === "free") {
-      var now       = new Date();
-      var thisMonth = now.getFullYear() + "-" + (now.getMonth() + 1);
-      var lastShown = localStorage.getItem("welcomeShownMonth");
-      if (lastShown !== thisMonth) {
-        var banner = document.getElementById("welcomeBanner");
-        if (banner) banner.style.display = "flex";
-        localStorage.setItem("welcomeShownMonth", thisMonth);
-      }
-    }
+    if (!user || user.plan !== "free") return; // Jamais pour Premium/Pro
+
+    var now       = new Date();
+    var thisMonth = now.getFullYear() + "-" + (now.getMonth() + 1);
+    var lastShown = localStorage.getItem("welcomeShownMonth");
+
+    // Afficher si : nouveau mois OU première visite (?welcome=1)
+    var params      = new URLSearchParams(window.location.search);
+    var isNewSignup = params.get("welcome") === "1";
     window.history.replaceState({}, "", window.location.pathname);
-  }
+
+    if (lastShown !== thisMonth || isNewSignup) {
+      var banner = document.getElementById("welcomeBanner");
+      if (banner) banner.style.display = "flex";
+      localStorage.setItem("welcomeShownMonth", thisMonth);
+    }
+  })();
 });
 
 function updateModelSelector() {
