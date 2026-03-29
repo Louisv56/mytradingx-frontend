@@ -214,7 +214,7 @@
         <option value="NEUTRE">NEUTRE</option>
       </select>
       <button class="filter-btn sort-btn" id="sortBtn" onclick="toggleSort()">
-        📅 Plus récent <span id="sortArrow">↓</span>
+        <span id="sortLabel">📅 Plus récent</span> <span id="sortArrow">↓</span>
       </button>
     </div>
 
@@ -338,13 +338,14 @@ function toggleSort() {
   _sortDesc = !_sortDesc;
   var btn   = document.getElementById("sortBtn");
   var arrow = document.getElementById("sortArrow");
+  var label = document.getElementById("sortLabel");
   if (_sortDesc) {
-    arrow.textContent    = "↓";
-    btn.firstChild.textContent = "📅 Plus récent ";
+    label.textContent = "📅 Plus récent";
+    arrow.textContent = "↓";
     btn.classList.remove("asc");
   } else {
-    arrow.textContent    = "↑";
-    btn.firstChild.textContent = "📅 Plus ancien ";
+    label.textContent = "📅 Plus ancien";
+    arrow.textContent = "↑";
     btn.classList.add("asc");
   }
   applyFilters();
