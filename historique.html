@@ -124,6 +124,14 @@
     .winrate-bar-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
     .winrate-bar-fill  { height: 100%; background: var(--accent3); border-radius: 3px; transition: width 0.5s; }
 
+    .filter-btn.sort-btn {
+      margin-left: auto;
+      border-color: var(--border2);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .filter-btn.sort-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-btn.sort-btn.asc { border-color: var(--accent); background: #38bdf815; color: var(--accent); }
+
     @media (max-width: 768px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .card-data  { grid-template-columns: repeat(2, 1fr); }
@@ -205,6 +213,9 @@
         <option value="SELL">SELL</option>
         <option value="NEUTRE">NEUTRE</option>
       </select>
+      <button class="filter-btn sort-btn" id="sortBtn" onclick="toggleSort()">
+        📅 Plus récent <span id="sortArrow">↓</span>
+      </button>
     </div>
 
     <div id="pageLoader" class="page-loader">Chargement de l'historique…</div>
@@ -223,6 +234,7 @@
 <script>
 var _allAnalyses  = [];
 var _activeFilter = "all";
+var _sortDesc     = true; // true = plus récent en premier
 
 var MODEL_LABELS = {
   "gpt-4o-mini": "MytAI Fast",
@@ -317,8 +329,24 @@ function buildAssetFilter(analyses) {
 
 function setFilter(filter, btn) {
   _activeFilter = filter;
-  document.querySelectorAll(".filter-btn").forEach(function(b){ b.classList.remove("active"); });
+  document.querySelectorAll(".filter-btn:not(.sort-btn)").forEach(function(b){ b.classList.remove("active"); });
   if (btn) btn.classList.add("active");
+  applyFilters();
+}
+
+function toggleSort() {
+  _sortDesc = !_sortDesc;
+  var btn   = document.getElementById("sortBtn");
+  var arrow = document.getElementById("sortArrow");
+  if (_sortDesc) {
+    arrow.textContent    = "↓";
+    btn.firstChild.textContent = "📅 Plus récent ";
+    btn.classList.remove("asc");
+  } else {
+    arrow.textContent    = "↑";
+    btn.firstChild.textContent = "📅 Plus ancien ";
+    btn.classList.add("asc");
+  }
   applyFilters();
 }
 
@@ -334,6 +362,14 @@ function applyFilters() {
     if (dirF   && a.direction !== dirF)   return false;
     return true;
   });
+
+  // Tri par date
+  filtered.sort(function(a, b) {
+    var dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+    var dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return _sortDesc ? dateB - dateA : dateA - dateB;
+  });
+
   renderList(filtered);
 }
 
