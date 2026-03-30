@@ -273,6 +273,12 @@ async function loadHistory() {
     var data = await res.json();
     if (data.error) { alert("Erreur : " + data.error); return; }
     _allAnalyses = data.analyses || [];
+    // Tri initial côté client (plus récent en premier par défaut)
+    _allAnalyses.sort(function(a, b) {
+      var strA = a.created_at || "";
+      var strB = b.created_at || "";
+      return strA < strB ? 1 : strA > strB ? -1 : 0;
+    });
     computeStats(_allAnalyses);
     buildAssetFilter(_allAnalyses);
     applyFilters();
@@ -364,11 +370,14 @@ function applyFilters() {
     return true;
   });
 
-  // Tri par date
+  // Tri par date — comparaison directe des strings ISO 8601 (format Supabase)
+  // Plus fiable que new Date() qui peut mal parser les fuseaux horaires
   filtered.sort(function(a, b) {
-    var dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-    var dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-    return _sortDesc ? dateB - dateA : dateA - dateB;
+    var strA = a.created_at || "";
+    var strB = b.created_at || "";
+    if (strA === strB) return 0;
+    if (_sortDesc) return strA < strB ? 1 : -1;
+    return strA > strB ? 1 : -1;
   });
 
   renderList(filtered);
