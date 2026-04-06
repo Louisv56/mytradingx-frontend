@@ -281,9 +281,9 @@ function injectProfileMenu(user, page) {
   var navHtml =
     '<div class="pd-section">'
     + '<div class="pd-section-label">Navigation</div>'
-    + '<a href="analyse.html" class="pd-item"><span class="pd-icon">📊</span><span>Analyse graphique<span class="pd-item-sub">Analyser un screenshot</span></span></a>'
-    + '<a href="historique.html" class="pd-item"><span class="pd-icon">📁</span><span>Historique<span class="pd-item-sub">Mes analyses passées</span></span></a>'
-    + '<a href="fondamental.html" class="pd-item"><span class="pd-icon">📰</span><span>Analyse fondamentale<span class="pd-item-sub">Actualités du marché</span></span></a>'
+    + '<a href="analyse.html" class="pd-item"><span class="pd-icon"></span><span>Analyse graphique<span class="pd-item-sub">Analyser un screenshot</span></span></a>'
+    + '<a href="historique.html" class="pd-item"><span class="pd-icon"></span><span>Historique<span class="pd-item-sub">Mes analyses passées</span></span></a>'
+    + '<a href="fondamental.html" class="pd-item"><span class="pd-icon"></span><span>Analyse fondamentale<span class="pd-item-sub">Actualités du marché</span></span></a>'
     + '</div>';
 
   // Abonnement
@@ -291,11 +291,11 @@ function injectProfileMenu(user, page) {
   if (user.plan === "premium" || user.plan === "pro") {
     subHtml +=
       '<button class="pd-item danger" onclick="confirmCancelSub()">'
-      + '<span class="pd-icon">🚫</span><span>Résilier l\'abonnement<span class="pd-item-sub">Actif jusqu\'à la fin de la période</span></span>'
+      + '<span class="pd-icon"></span><span>Résilier l\'abonnement<span class="pd-item-sub">Actif jusqu\'à la fin de la période</span></span>'
       + '</button>';
   }
   subHtml +=
-    '<a href="tarifs.html" class="pd-item"><span class="pd-icon">💰</span><span>Voir les tarifs<span class="pd-item-sub">Plans Free, Premium, Pro</span></span></a>'
+    '<a href="tarifs.html" class="pd-item"><span class="pd-icon"></span><span>Voir les tarifs<span class="pd-item-sub">Plans Free, Premium, Pro</span></span></a>'
     + '</div>';
 
   // Upgrade banner (si Free ou Premium)
