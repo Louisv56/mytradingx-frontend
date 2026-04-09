@@ -354,8 +354,9 @@ nav {
 .float-badge .fb-text { font-size: 0.72rem; }
 .float-badge .fb-text strong { display: block; color: white; font-size: 0.8rem; font-weight: 700; }
 .float-badge .fb-text span { color: var(--muted2); }
-.fb-1 { top: -18px; right: 30px; animation-delay: 0.8s; }
-.fb-2 { bottom: 30px; left: -18px; animation-delay: 1s; }
+.aw-wrapper { position: relative; }
+.fb-1 { top: -14px; right: 20px; animation-delay: 0.8s; }
+.fb-2 { bottom: 60px; left: -14px; animation-delay: 1s; }
 @keyframes badgeIn { from { opacity:0; transform:scale(0.8) translateY(6px) } to { opacity:1; transform:scale(1) translateY(0) } }
 
 /* ── Features ── */
@@ -534,23 +535,22 @@ footer a:hover { color: var(--accent); }
       <!-- RIGHT: fenêtre d'analyse graphique -->
       <div class="hero-right">
 
-        <!-- badges flottants -->
-        <div class="float-badge fb-1">
-          <span class="fb-icon">⚡</span>
-          <div class="fb-text">
-            <strong>Analyse en cours…</strong>
-            <span>Détection SMC · FVG · BOS</span>
+        <!-- fenêtre principale + badges dans un wrapper commun -->
+        <div class="aw-wrapper">
+          <div class="float-badge fb-1">
+            <span class="fb-icon">⚡</span>
+            <div class="fb-text">
+              <strong>Analyse en cours…</strong>
+              <span>Détection SMC · FVG · BOS</span>
+            </div>
           </div>
-        </div>
-        <div class="float-badge fb-2">
-          <span class="fb-icon">🎯</span>
-          <div class="fb-text">
-            <strong>Setup LONG détecté</strong>
-            <span>R/R 1:3.2 · 72% probabilité</span>
+          <div class="float-badge fb-2">
+            <span class="fb-icon">🎯</span>
+            <div class="fb-text">
+              <strong>Setup LONG détecté</strong>
+              <span>R/R 1:3.2 · 72% probabilité</span>
+            </div>
           </div>
-        </div>
-
-        <!-- fenêtre principale -->
         <div class="analysis-window">
 
           <!-- titlebar -->
@@ -668,6 +668,7 @@ footer a:hover { color: var(--accent); }
 
           </div><!-- /aw-body -->
         </div><!-- /analysis-window -->
+        </div><!-- /aw-wrapper -->
       </div><!-- /hero-right -->
     </div><!-- /hero-inner -->
   </div>
