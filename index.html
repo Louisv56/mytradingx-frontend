@@ -45,25 +45,26 @@
   pointer-events: none;
 }
 .hero-inner {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 48px; align-items: center;
-  max-width: 1100px; margin: 0 auto; padding: 0 24px;
+  display: flex; flex-direction: column; align-items: center;
+  max-width: 720px; margin: 0 auto; padding: 0 24px;
+  text-align: center;
 }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 8px;
   background: #38bdf811; border: 1px solid #38bdf822;
   color: var(--accent); padding: 6px 14px; border-radius: 20px;
   font-size: 0.8rem; font-weight: 600; margin-bottom: 20px;
+  align-self: center;
 }
 .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 .hero-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem,4vw,3rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; color: white; }
 .hero-title em { color: var(--accent); font-style: normal; }
-.hero-sub { font-size: 1rem; color: var(--muted2); margin-bottom: 28px; line-height: 1.7; }
-.hero-perks { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
+.hero-sub { font-size: 1rem; color: var(--muted2); margin-bottom: 28px; line-height: 1.7; max-width: 580px; }
+.hero-perks { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; align-items: center; }
 .hero-perk { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--muted2); }
 .hero-perk::before { content: "✓"; color: var(--accent3); font-weight: 700; }
-.hero-cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.hero-cta-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 
 /* ── Outil intégré ── */
 .tool-card {
@@ -73,6 +74,8 @@
   overflow: hidden;
   box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 0 1px #38bdf80a;
   position: relative;
+  width: 100%;
+  margin-top: 32px;
 }
 .tool-header {
   background: var(--bg2);
@@ -220,7 +223,7 @@ footer a:hover { color: var(--accent); }
 .tr-label { color: var(--accent); font-size: 0.68em; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; font-weight: 600; }
 
 @media (max-width: 900px) {
-  .hero-inner { grid-template-columns: 1fr; }
+  .hero-inner { padding: 0 16px; }
   .features-strip-grid { grid-template-columns: 1fr 1fr; }
   .proof-stat { padding: 16px 24px; }
 }
