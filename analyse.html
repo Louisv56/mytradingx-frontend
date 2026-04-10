@@ -24,6 +24,40 @@
 .analyse-page { padding: 88px 0 60px; }
 .analyse-layout { display: grid; grid-template-columns: 1fr 450px; gap: 24px; align-items: start; }
 .drop-zone-main { min-height: 130px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+/* ── Bouton TradingView ── */
+.btn-tradingview {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 11px 16px;
+  background: #131a2a; border: 1px solid #1e3050;
+  border-radius: 10px; cursor: pointer;
+  text-decoration: none; transition: all 0.2s;
+  margin-bottom: 16px; gap: 10px;
+}
+.btn-tradingview:hover {
+  border-color: #2962ff;
+  background: #2962ff0d;
+  box-shadow: 0 0 16px #2962ff18;
+}
+.btn-tradingview-left { display: flex; align-items: center; gap: 10px; }
+.btn-tradingview-logo {
+  width: 30px; height: 30px; border-radius: 7px;
+  background: #2962ff; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 0.8rem; font-weight: 900; color: white;
+  font-family: 'Syne', sans-serif; letter-spacing: -0.05em;
+}
+.btn-tradingview-text strong {
+  display: block; color: white; font-size: 0.85rem; font-weight: 700;
+  font-family: 'Syne', sans-serif;
+}
+.btn-tradingview-text span {
+  font-size: 0.72rem; color: var(--muted2);
+}
+.btn-tradingview-arrow {
+  color: #2962ff; font-size: 0.85rem; opacity: 0.7;
+  transition: transform 0.2s;
+}
+.btn-tradingview:hover .btn-tradingview-arrow { transform: translateX(3px); opacity: 1; }
+
 .btn-multitf {
   display: flex; align-items: center; gap: 6px;
   background: none; border: 1px dashed var(--border);
@@ -147,6 +181,18 @@
               </select>
             </div>
           </div>
+
+          <!-- Raccourci TradingView -->
+          <a href="https://www.tradingview.com/chart/" target="_blank" rel="noopener" class="btn-tradingview">
+            <div class="btn-tradingview-left">
+              <div class="btn-tradingview-logo">TV</div>
+              <div class="btn-tradingview-text">
+                <strong>Ouvrir TradingView</strong>
+                <span>Faites votre screenshot, puis revenez uploader ici</span>
+              </div>
+            </div>
+            <span class="btn-tradingview-arrow">↗</span>
+          </a>
 
           <!-- Upload zones -->
           <div class="form-group">
