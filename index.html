@@ -578,10 +578,11 @@ footer a:hover { color: var(--accent); }
             </div>
 
             <!-- upload zone -->
-            <div class="aw-upload-zone" onclick="this.style.borderColor='var(--accent)'">
-              <span class="aw-upload-icon">📊</span>
-              <div class="aw-upload-title">Déposez votre graphique ici</div>
-              <div class="aw-upload-sub">
+            <input type="file" id="heroFileInput" accept="image/png,image/jpeg,image/jpg,image/webp" style="display:none;">
+            <div class="aw-upload-zone" id="heroUploadZone">
+              <span class="aw-upload-icon" id="heroUploadIcon">📊</span>
+              <div class="aw-upload-title" id="heroUploadTitle">Déposez votre graphique ici</div>
+              <div class="aw-upload-sub" id="heroUploadSub">
                 PNG, JPG acceptés · HTF seul ou <span>HTF + LTF</span> pour multi-timeframe<br>
                 Cliquez ou glissez votre screenshot depuis votre plateforme
               </div>
@@ -834,6 +835,62 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 });
+
+// ── Upload zone hero ──
+(function() {
+  var zone   = document.getElementById('heroUploadZone');
+  var input  = document.getElementById('heroFileInput');
+  var icon   = document.getElementById('heroUploadIcon');
+  var title  = document.getElementById('heroUploadTitle');
+  var sub    = document.getElementById('heroUploadSub');
+
+  if (!zone || !input) return;
+
+  // Clic → ouvre l'explorateur
+  zone.addEventListener('click', function() { input.click(); });
+
+  // Fichier sélectionné via l'explorateur
+  input.addEventListener('change', function() {
+    if (input.files && input.files[0]) handleFile(input.files[0]);
+  });
+
+  // Drag & drop
+  zone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    zone.style.borderColor = 'var(--accent)';
+    zone.style.background  = '#38bdf810';
+  });
+  zone.addEventListener('dragleave', function() {
+    zone.style.borderColor = '';
+    zone.style.background  = '';
+  });
+  zone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    zone.style.borderColor = '';
+    zone.style.background  = '';
+    var file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+
+  function handleFile(file) {
+    // Vérification type
+    if (!file.type.match(/^image\//)) {
+      title.textContent = '⚠ Fichier non supporté';
+      sub.innerHTML = 'Veuillez déposer une image PNG ou JPG.';
+      return;
+    }
+    // Affiche le nom du fichier et redirige vers la page d'analyse
+    icon.textContent  = '✅';
+    title.textContent = file.name;
+    sub.innerHTML     = 'Fichier prêt · <span>Redirection vers l\'analyse…</span>';
+    zone.style.borderColor = 'var(--accent3)';
+    zone.style.background  = '#4ade8008';
+    // Petit délai pour que l'utilisateur voie le feedback, puis inscription/analyse
+    setTimeout(function() {
+      window.location.href = 'login.html?tab=register';
+    }, 900);
+  }
+})();
 
 async function subscribeLanding(plan) {
   var user = typeof getUser === 'function' ? getUser() : null;
