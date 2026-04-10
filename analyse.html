@@ -41,9 +41,8 @@
 .btn-tradingview-left { display: flex; align-items: center; gap: 10px; }
 .btn-tradingview-logo {
   width: 30px; height: 30px; border-radius: 7px;
-  background: #2962ff; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; font-size: 0.8rem; font-weight: 900; color: white;
-  font-family: 'Syne', sans-serif; letter-spacing: -0.05em;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
 }
 .btn-tradingview-text strong {
   display: block; color: white; font-size: 0.85rem; font-weight: 700;
@@ -649,7 +648,7 @@ async function saveTradeResult() {
 <div style="max-width:480px; margin:32px auto 48px; padding:0 24px;">
   <a href="https://www.tradingview.com/chart/" target="_blank" rel="noopener" class="btn-tradingview">
     <div class="btn-tradingview-left">
-      <div class="btn-tradingview-logo">TV</div>
+      <div class="btn-tradingview-logo"><img src="logotradingview.png" alt="TradingView" style="width:30px;height:30px;border-radius:7px;display:block;"></div>
       <div class="btn-tradingview-text">
         <strong>Ouvrir TradingView</strong>
         <span>Faites votre screenshot, puis revenez uploader ici</span>
