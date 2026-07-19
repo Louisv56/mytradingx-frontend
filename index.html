@@ -297,17 +297,17 @@ nav {
   animation: slideInRight 0.9s cubic-bezier(0.4, 0, 0.2, 1) both 0.3s;
 }
 
-/* glow halo behind the window — suit les bords arrondis */
+/* glow halo behind the window — collé aux bords arrondis */
 .hero-right::before {
   content: '';
   position: absolute;
-  top: -30px; left: -30px; right: -30px; bottom: -30px;
+  top: -12px; left: -12px; right: -12px; bottom: -12px;
   background:
-    radial-gradient(ellipse 70% 70% at 50% 40%, #38bdf810 0%, transparent 55%),
-    radial-gradient(ellipse 50% 50% at 70% 80%, #7c3aed08 0%, transparent 50%);
+    radial-gradient(ellipse 80% 80% at 50% 40%, #38bdf812 0%, transparent 55%),
+    radial-gradient(ellipse 60% 60% at 70% 80%, #7c3aed08 0%, transparent 50%);
   pointer-events: none; z-index: 0;
   animation: glowPulse 4s ease infinite;
-  border-radius: 32px;
+  border-radius: 28px;
 }
 
 .analysis-window {
