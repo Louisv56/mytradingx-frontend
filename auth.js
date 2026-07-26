@@ -599,16 +599,7 @@ function loadGA() {
   };
 }
 
-// Si l'utilisateur a déjà donné son consentement analytics → charger GA
-(function() {
-  var consent = localStorage.getItem("cookieConsent");
-  if (consent) {
-    try {
-      var prefs = JSON.parse(consent);
-      if (prefs.analytics) loadGA();
-    } catch(e) {}
-  }
-})();
+// GA déjà chargé via le tag dans le HTML, pas besoin de le recharger ici
 
 // ── Cookie Consent ────────────────────────────────────────────────────────────
 (function() {
