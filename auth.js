@@ -295,7 +295,7 @@ function injectProfileMenu(user, page) {
       + '</button>';
   }
   subHtml +=
-    '<a href="tarifs.html" class="pd-item"><span class="pd-icon"></span><span>Voir les tarifs<span class="pd-item-sub">Plans Free, Premium, Pro</span></span></a>'
+  '<a href="index.html#pricing" class="pd-item"><span class="pd-icon"></span><span>Voir les tarifs<span class="pd-item-sub">Plans Free, Premium, Pro</span></span></a>'
     + '</div>';
 
   // Upgrade banner (si Free ou Premium)
