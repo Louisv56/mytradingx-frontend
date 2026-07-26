@@ -480,6 +480,7 @@ footer a:hover { color: var(--accent); }
   .price-main { font-size: 3rem; }
 }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -487,18 +488,19 @@ footer a:hover { color: var(--accent); }
 <nav>
   <a href="index.html" class="nav-logo">MyTrading<span>X</span></a>
   <div class="nav-links">
-    <a href="dashboard.html">Dashboard</a>
+    <a href="index.html#features">Fonctionnalités</a>
+    <a href="index.html#pricing">Tarifs</a>
     <a href="analyse.html">Analyse</a>
     <a href="historique.html">Historique</a>
     <a href="fondamental.html">Fondamental</a>
     <a href="blog.html">Blog</a>
-    <a href="tarifs.html">Tarifs</a>
-    <a href="signaux.html" class="active" style="color:var(--accent2);">Signaux IA</a>
+    <a href="signaux.html" class="active">Signaux IA</a>
   </div>
   <div class="nav-right">
     <span id="navUser" class="nav-user hidden"></span>
     <span id="navPlan" class="nav-plan hidden"></span>
-    <a href="login.html" id="navLogin" class="btn btn-outline btn-sm hidden">Connexion</a>
+    <a href="dashboard.html" id="navDashboard" class="btn btn-secondary btn-sm hidden">Dashboard</a>
+    <a href="login.html" id="navLogin" class="btn btn-outline btn-sm">Connexion</a>
     <button onclick="logout()" id="navLogout" class="btn btn-secondary btn-sm hidden">Déconnexion</button>
   </div>
 </nav>
@@ -526,7 +528,7 @@ footer a:hover { color: var(--accent); }
         </p>
 
         <div class="hero-cta">
-          <a href="tarifs.html" class="btn-cta-pro">
+          <a href="index.html#pricing" class="btn-cta-pro">
             ⭐ Accéder avec le plan Pro
           </a>
           <a href="https://t.me/mytradingx_public" target="_blank" rel="noopener" class="btn-cta-tg">
@@ -838,7 +840,7 @@ footer a:hover { color: var(--accent); }
       </ul>
 
       <div class="pricing-btns">
-        <a href="tarifs.html" class="btn btn-pro btn-lg">⭐ Passer au plan Pro</a>
+        <a href="index.html#pricing" class="btn btn-pro btn-lg">⭐ Passer au plan Pro</a>
         <a href="https://t.me/mytradingx_public" target="_blank" rel="noopener" class="btn btn-tg btn-lg">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
           Groupe public gratuit
