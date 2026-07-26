@@ -522,8 +522,6 @@ function closeUpgradeModal() {
 async function subscribe(plan) {
   var user = getUser();
   if (!user) { openAuthModal(); return; }
-  var newTab = window.open("", "_blank");
-  if (newTab) newTab.document.write("<p style='font-family:sans-serif;padding:40px;color:#64748b;'>Chargement du paiement...</p>");
   try {
     var res  = await fetch(API + "/create-checkout", {
       method: "POST",
@@ -532,18 +530,14 @@ async function subscribe(plan) {
     });
     var data = await res.json();
     if (data.url) {
-      if (newTab) newTab.location.href = data.url;
-      else window.location.href = data.url;
+      window.location.href = data.url;
     } else {
-      if (newTab) newTab.close();
       alert("Erreur : " + data.error);
     }
   } catch(e) {
-    if (newTab) newTab.close();
     alert("Erreur réseau");
   }
 }
-
 async function cancelSubscription() {
   var user = getUser();
   if (!user) return;
