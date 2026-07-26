@@ -295,7 +295,7 @@ function injectProfileMenu(user, page) {
       + '</button>';
   }
   subHtml +=
-  '<a href="index.html#pricing" class="pd-item"><span class="pd-icon"></span><span>Voir les tarifs<span class="pd-item-sub">Plans Free, Premium, Pro</span></span></a>'
+    '<a href="index.html#pricing" class="pd-item"><span class="pd-icon"></span><span>Voir les tarifs<span class="pd-item-sub">Plans Free, Premium, Pro</span></span></a>'
     + '</div>';
 
   // Upgrade banner (si Free ou Premium)
@@ -522,6 +522,8 @@ function closeUpgradeModal() {
 async function subscribe(plan) {
   var user = getUser();
   if (!user) { openAuthModal(); return; }
+  // Paiement dans le même onglet
+  
   try {
     var res  = await fetch(API + "/create-checkout", {
       method: "POST",
@@ -538,6 +540,7 @@ async function subscribe(plan) {
     alert("Erreur réseau");
   }
 }
+
 async function cancelSubscription() {
   var user = getUser();
   if (!user) return;
@@ -599,7 +602,7 @@ function loadGA() {
   };
 }
 
-// GA déjà chargé via le tag dans le HTML, pas besoin de le recharger ici
+// GA déjà chargé via le tag dans le HTML
 
 // ── Cookie Consent ────────────────────────────────────────────────────────────
 (function() {
